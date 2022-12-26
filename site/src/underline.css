@@ -1,0 +1,10 @@
+hr { 
+    display: block;
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-left: 8%;
+    margin-right: 8%;
+    border-style: inset;
+    border-width: 0.1px;
+    border-color: black;
+  } 
