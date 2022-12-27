@@ -53,8 +53,9 @@ const connectWallet = async () => {
         <div className="logo">wav pool</div>
           <nav>
               <ul className="nav_links">
-              <li><a href="#">about</a></li>
-              <li><a href="#">discord</a></li>
+                <li><a href="#">the pool</a></li>
+                <li><a href="#">discord</a></li>
+                <li><a href="#">about</a></li>
               </ul>
           </nav>
           <a className="connect" href="#">
