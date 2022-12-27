@@ -1,6 +1,6 @@
 .wave-text {
     background: linear-gradient(to right,purple, rgb(0, 0, 166), rgb(94, 0, 94), rgb(149, 1, 1), green);
-    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
