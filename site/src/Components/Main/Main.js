@@ -1,5 +1,6 @@
 import './main.css';
 import './main-button.css'
+import './main-header.css'
 import React, {useEffect, useState} from "react";
 const {ethers} = require("ethers");
 
@@ -8,9 +9,9 @@ export default function Main(){
 
     return(
         <div>
-            <div className='body2'>
+            <div className='wave-text'>
                 <div className='content'>
-                    <h3>Be a part of the newest wav of music creation.</h3>
+                    <h3 className='wave-text'>Be a part of the newest wav of music creation.</h3>
                 </div>
             </div>
             <div className='grandparent'>

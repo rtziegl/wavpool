@@ -34,15 +34,15 @@
   }
   
   .button-592:hover {
-    border-color: #DC1FFF;
-    color: #DC1FFF;
-    fill: #DC1FFF;
+    border-color: #A7117A;
+    color: #A7117A;
+    fill: #A7117A;
   }
   
   .button-592:active {
-    border-color: #DC1FFF;
-    color: #DC1FFF;
-    fill: #DC1FFF;
+    border-color: #A7117A;
+    color: #A7117A;
+    fill: #A7117A;
   }
   
   @media (min-width: 10px) {
