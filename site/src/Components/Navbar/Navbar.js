@@ -1,7 +1,21 @@
 import './nav-button.css';
 import './nav.css';
+import { Link, useMatch, useResolvedPath } from "react-router-dom"
 import React, {useEffect, useState} from "react";
 const {ethers} = require("ethers");
+
+function CustomLink({ to, children, ...props }) {
+  const resolvedPath = useResolvedPath(to)
+  const isActive = useMatch({ path: resolvedPath.pathname, end: true })
+
+  return (
+      <li className={isActive ? "active" : ""}>
+          <Link to={to} {...props}>
+              {children}
+          </Link>
+      </li>
+  )
+}
 
 export default function Navbar(){
   const [currentAccount, setCurrentAccount] = useState("No account connected.");
@@ -49,20 +63,20 @@ const connectWallet = async () => {
   }, [])
 
   return(
-      <div className='head'>
-        <div className="logo">wav pool</div>
-          <nav>
-              <ul className="nav_links">
-                <li><a href="#">the pool</a></li>
-                <li><a href="#">discord</a></li>
-                <li><a href="#">about</a></li>
-              </ul>
-          </nav>
-          <a className="connect" href="#">
-            {!connected && (<button className="button-59" role="button" onClick={() => connectWallet()}>connect wallet</button>)}
-            {connected && (<div className="account">{currentAccount.substring(0,10)}..</div>)}
-            </a>
-      </div>
+    <div className='head'>
+      <div className="logo"><Link to='/'>wav pool</Link></div>
+      <nav>
+          <ul className="nav_links">
+            <li><a href="#"><CustomLink to='/thepool'>the pool</CustomLink></a></li>
+            <li><a href="#"><CustomLink to='/discord'>discord</CustomLink></a></li>
+            <li><a href="#"><CustomLink to='/about'>about</CustomLink></a></li>
+          </ul>
+      </nav>
+      <a className="connect" href="#">
+        {!connected && (<button className="button-59" role="button" onClick={() => connectWallet()}>connect wallet</button>)}
+        {connected && (<div className="account">{currentAccount.substring(0,10)}..</div>)}
+      </a>
+    </div>
   );
 }
     
