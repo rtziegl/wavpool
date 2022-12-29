@@ -40,4 +40,9 @@ contract Competition is Ownable{
         delete usersInCompetition;
         spotsInCompetition = 100;
     }
+
+    function withdrawMoney() public onlyOwner {
+        address payable to = payable(msg.sender);
+        to.transfer(getBalanceOfContract());
+    }
 }
