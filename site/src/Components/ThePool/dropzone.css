@@ -17,13 +17,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: #215CAF 3px 3px 20px;
-    border-radius: 600px;
-    background-color: #215CAF;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
   
   #label-file-upload.drag-active {
-    box-shadow: #215CAF 3px 3px 500px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 500px;
   }
   
   .upload-button {
@@ -43,7 +41,6 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 1rem;
     top: 0px;
     right: 0px;
     bottom: 0px;
@@ -52,9 +49,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: #215CAF 3px 3px 20px;
-    border-radius: 600px;
-    background-color: #215CAF;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
 
   .wrap{
@@ -62,7 +57,7 @@
     align-items: center;
     align-content: center;
     justify-content: center;
-    padding-top: 3%;
+    padding-top: 14%;
     flex-direction: column;
   }
 
@@ -70,7 +65,7 @@
     display: flex;
     flex-direction: row;
     display: inline-block;
-    padding-top: 40px;
+    padding-top: 500px;
     align-items: center;
     justify-content: center;
   }
