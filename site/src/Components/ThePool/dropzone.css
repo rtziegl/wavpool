@@ -69,3 +69,20 @@
     align-items: center;
     justify-content: center;
   }
+
+  .after-drop-bg{
+    height: 16rem;
+    width: 28rem;
+    max-width: 100%;
+    text-align: center;
+    position: relative;
+    padding-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
+
+  .after-drop{
+
+  }

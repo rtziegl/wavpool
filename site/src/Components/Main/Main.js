@@ -11,14 +11,14 @@ export default function Main(){
         <div>
             <div className='wave-text'>
                 <div className='content'>
-                    <h3 className='wave-text'>Be a part of the newest wav of music creation.</h3>
+                    <h3 className='wave-text'>Be a part of the newest wave of music creation.</h3>
                 </div>
             </div>
             <div className='grandparent'>
                 <div className="parent">
                     <div className="child1">
                         <div className='left-box'>
-                            <div className='box-header'>Catch the next wav</div>
+                            <div className='box-header'>Catch the next wave</div>
                             <li className='main-li'>Connect your metamask wallet.</li>
                             <li className='main-li'>Buyin to the competition.</li>
                             <li className='main-li'>Make a beat with the sample given to you on buy in.</li>
