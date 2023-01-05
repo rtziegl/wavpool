@@ -47,10 +47,8 @@ export default function DragDropFile() {
       e.preventDefault();
       setDropped(true);
       if (e.target.files && e.target.files[0]) {
-        let file = e.dataTransfer.files[0];
+        let file = e.target.files[0];
         let reader = new FileReader();
-        console.log(reader.LOADING)
-        console.log(file)
 
         if (file.type != "audio/mpeg")
             console.log("Oops")
@@ -73,7 +71,7 @@ export default function DragDropFile() {
     <div>
         
         {!justDropped && <div className="wrap"><form id="form-file-upload" onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()}>
-            <input ref={inputRef} type="file" id="input-file-upload" multiple={false} onChange={handleChange} />
+            <input ref={inputRef} type="file" id="input-file-upload" multiple={false} onChange={handleChange} onSubmit={(e) => e.preventDefault()} />
             <label id="label-file-upload" htmlFor="input-file-upload" className={dragActive ? "drag-active" : "" }>
                 <div className="around-form">
                     <p>Drag and drop your file here or</p>
