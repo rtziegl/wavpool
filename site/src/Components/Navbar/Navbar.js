@@ -30,6 +30,7 @@ export default function Navbar(){
         const account = accounts[0];
         console.log("Found an authorized account:", account);
         setCurrentAccount(account);
+        toggleConnect(true)
         return true;
     } 
     else
@@ -50,6 +51,7 @@ const connectWallet = async () => {
         const accounts = await ethereum.request({ method: "eth_requestAccounts" });
         console.log("Connected", accounts[0]);
         setCurrentAccount(accounts[0]);
+        toggleConnect(true)
       }
       
     } catch (error) {
@@ -58,8 +60,7 @@ const connectWallet = async () => {
   }
 
   useEffect(() => {
-    if (checkIfWalletConnected())
-      toggleConnect(true)
+    checkIfWalletConnected()
   }, [])
 
   return(
@@ -67,9 +68,9 @@ const connectWallet = async () => {
       <div className="logo"><Link to='/'>wav pool</Link></div>
       <nav>
           <ul className="nav_links">
-            <li><a href="#"><CustomLink to='/thepool'>the pool</CustomLink></a></li>
-            <li><a href="#"><CustomLink to='/discord'>discord</CustomLink></a></li>
-            <li><a href="#"><CustomLink to='/about'>about</CustomLink></a></li>
+            <CustomLink to='/thepool'>the pool</CustomLink>
+            <CustomLink to='/discord'>discord</CustomLink>
+            <CustomLink to='/about'>about</CustomLink>
           </ul>
       </nav>
       <a className="connect" href="#">
