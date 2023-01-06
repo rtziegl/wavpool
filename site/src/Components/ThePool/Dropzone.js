@@ -1,4 +1,5 @@
 import "./dropzone.css";
+import MetaForm from "./MetaForm";
 import React, {useEffect, useState, useRef} from "react";
 
 export default function DragDropFile() {
@@ -83,7 +84,13 @@ export default function DragDropFile() {
             }
         </form></div>}
         
-        {justDropped && <div className="after-drop-bg"> <div className="after-drop"> HI </div> </div>}
+        {justDropped && <div className="after-drop-bg"> 
+          <div className="after-drop">
+          </div>
+          <div className="after-drop"> 
+            <MetaForm /> 
+          </div>
+          </div>}
       </div>
     );
   };

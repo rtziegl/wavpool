@@ -73,9 +73,9 @@
   .after-drop-bg{
     position: relative;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-content: center;
-    position: relative;
     height: 650px;
     width: 50%;
     margin-left: 25%;
@@ -84,5 +84,14 @@
   }
 
   .after-drop{
+    height: 250px;
+    width: 50%;
+    display: block;
+    margin-right: 0%;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
+  }
+
+  textarea {
+    resize: none;
   }
