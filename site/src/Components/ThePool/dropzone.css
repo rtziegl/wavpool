@@ -83,15 +83,54 @@
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
 
-  .after-drop{
+  .after-drop-left{
     height: 250px;
-    width: 50%;
-    display: block;
-    margin-right: 0%;
+    width: 45%;
+    display: flex;
+    justify-content: flex-start;
+    align-content: flex-start;
+    margin-right: 6%;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
 
+  .after-drop-right{
+    width: 65%;
+  }
+
+  .meta-form{
+    margin-top: 30px;
+  }
+  .meta-form label{
+    display: flex;
+    flex-direction: row;
+    padding-top: 15px;
+    padding-bottom: 5px;
+  }
+
+  .meta-form div{
+    padding-bottom: 20px;
+  }
+
+  .meta-form .extra-text-space{
+    padding-bottom: 10px;
+  }
+
+  .meta-form .extra-button-space{
+    padding-top: 20px;
+  }
+
+  input{
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    box-sizing: border-box;
+    outline-color: #A7117A;
+    padding-bottom: 6px;
   }
 
   textarea {
     resize: none;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    box-sizing: border-box;
+    outline-color: #A7117A;
   }

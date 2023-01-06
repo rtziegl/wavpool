@@ -14,7 +14,7 @@ export default function MetaForm(){
     }
 
     return(
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="meta-form">
             <div>
                 <label htmlFor="title">Title</label>
                 <input
@@ -52,7 +52,7 @@ export default function MetaForm(){
                 />
             </div>
             <div>
-                <label htmlFor="description">Description</label>
+                <label className='extra-text-space' htmlFor="description">Description</label>
                 <textarea
                 id="description"
                 value={description}
@@ -61,7 +61,9 @@ export default function MetaForm(){
                 cols="50"
                 />
             </div>
-            <button type="submit">Submit</button>
+            <div className="extra-button-space">
+                <button className="button-59" role="button" type="submit">Submit</button>
+            </div>
     </form>
     );
 }
