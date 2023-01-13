@@ -2,11 +2,14 @@ import "./dropzone.css";
 import "./meta-button.css";
 import MetaForm from "./MetaForm";
 import React, {useEffect, useState, useRef} from "react";
+import {FaPlayCircle} from "react-icons/fa";
+import { FaPause } from "react-icons/fa";
 
 export default function DragDropFile() {
     // drag state
     const [dragActive, setDragActive] = useState(false);
     const [justDropped, setDropped] = useState(false);
+    const [file, setFile] = useState();
     // ref
     const inputRef = useRef(null);
     
@@ -27,19 +30,15 @@ export default function DragDropFile() {
       e.stopPropagation();
       setDragActive(false);
       setDropped(true)
+
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
         let file = e.dataTransfer.files[0];
-        let reader = new FileReader();
         console.log(file)
-
-        if (file.type != "audio/mpeg")
-            console.log("Oops")
+        
+        if (file.type != "audio/mpeg" && file.type !="audio/wav")
+            alert("Wrong file type, must be mp3 or wav.")
         else{
-            reader.readAsDataURL(file);
-            reader.onload = e => {
-                const audio = new Audio(e.target.result);
-                audio.play();
-            };
+          setFile(file)
         }
       }
     };
@@ -50,25 +49,32 @@ export default function DragDropFile() {
       setDropped(true);
       if (e.target.files && e.target.files[0]) {
         let file = e.target.files[0];
-        let reader = new FileReader();
+        console.log(file)
 
-        if (file.type != "audio/mpeg")
-            console.log("Oops")
+        if (file.type != "audio/mpeg" && file.type !="audio/wav")
+          alert("Wrong file type, must be mp3 or wav.")
         else{
-            reader.readAsDataURL(file);
-            reader.onload = e => {
-                const audio = new Audio(e.target.result);
-                audio.play();
-            };
+          setFile(file)
         }
       }
     };
     
-  // triggers the input when the button is clicked
+    // triggers the input when the button is clicked
     const onButtonClick = () => {
       inputRef.current.click();
     };
     
+  
+    const play = () => {
+      let reader = new FileReader();
+      reader.readAsDataURL(file)
+      reader.onload = e => {
+        const audio = new Audio(e.target.result);
+        audio.play();
+      };
+      
+    };
+
     return (
     <div>
         
@@ -87,6 +93,7 @@ export default function DragDropFile() {
         
         {justDropped && <div className="after-drop-bg"> 
           <div className="after-drop-left">
+            <div className="play-button"><div onClick={play}><FaPlayCircle /></div></div>
           </div>
           <div className="after-drop-right"> 
             <MetaForm /> 

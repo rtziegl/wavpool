@@ -87,7 +87,7 @@
     height: 250px;
     width: 45%;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-content: flex-start;
     margin-right: 6%;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
@@ -133,4 +133,12 @@
     border-radius: 2px;
     box-sizing: border-box;
     outline-color: #A7117A;
+  }
+
+.play-button{
+    font-size: 65px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    text-align: center;
   }
