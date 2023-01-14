@@ -119,7 +119,7 @@ export default function DragDropFile() {
           </div>
         </div>
         <div className="after-drop-right">
-          <MetaForm />
+          <MetaForm file={file}/>
         </div>
       </div>}
     </div>
