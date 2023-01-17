@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef} from "react";
+
 export default function MetaForm(file) {
     const [title, setTitle] = useState('');
     const [producer, setProducer] = useState('');
@@ -69,7 +70,7 @@ export default function MetaForm(file) {
                     cols="50"
                 />
             </div>
-            <div className="extra-button-space">
+            <div className="extra-button-space-1">
                 <button className="button-59" role="button" type="submit">Submit</button>
             </div>
         </form>
