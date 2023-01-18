@@ -4,6 +4,7 @@ import MetaForm from "./MetaForm";
 import React, { useEffect, useState, useRef } from "react";
 import { FaPlayCircle } from "react-icons/fa";
 import { FaPauseCircle } from "react-icons/fa";
+import * as IPFS from "ipfs-core";
 
 export default function DragDropFile() {
   // Drag state.
@@ -104,6 +105,15 @@ export default function DragDropFile() {
     audioObject.pause()
   };
 
+  // Add audio file to IPFS and get the cid.
+  const commitFileToIPFS = async () => {
+    const node = await IPFS.create({repo: 'ok' + Math.random()})
+    const results = await node.add(file)
+
+    console.log(results)
+    console.log(results.path)
+  }
+
   return (
     <div>
       {!justDropped && !correctFileType && <div className="wrap"><form id="form-file-upload" onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()}>
@@ -143,7 +153,7 @@ export default function DragDropFile() {
         <button className="upload-button-1" onClick={onButtonClick}>Change File</button>
         <h4>or</h4>
         <div className="extra-button-space-1">
-                <button className="button-59" role="button" type="submit">Upload</button>
+                <button className="button-59" role="button" type="submit" onClick={commitFileToIPFS}>Upload</button>
             </div>
         </div>}
 
