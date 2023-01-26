@@ -112,7 +112,12 @@ export default function DragDropFile() {
   const commitFileToIPFS = async () => {
     const node = await IPFS.create({repo: 'ok' + Math.random()})
     const results = await node.add(file)
+
+    // Setting CID.
     setCid(results.path)
+
+    // Setting Metadata Screen.
+    setSubmit(true)
    
     
 
@@ -136,19 +141,7 @@ export default function DragDropFile() {
         }
       </form></div>}
 
-      {justSubmitted && justDropped && <div className="after-drop-bg">
-        <div className="after-drop-left">
-          <div className="play-button">
-            {!click && <div onClick={play}><FaPlayCircle /></div>}
-            {click && <div onClick={pause}><FaPauseCircle /></div>}
-          </div>
-        </div>
-        <div className="after-drop-right">
-          <MetaForm file={file}/>
-        </div>
-      </div>}
-
-      {correctFileType && <div className="after-drop-bg">
+      {correctFileType && !justSubmitted && <div className="after-drop-bg">
       <h3>File Preview</h3>
       <div className="after-drop-top">
           <div className="play-button">
@@ -161,11 +154,15 @@ export default function DragDropFile() {
         <h4>or</h4>
         <div className="extra-button-space-1">
                 <button className="button-59" role="button" type="submit" onClick={commitFileToIPFS}>Upload</button>
-                {cid}
             </div>
         </div>}
 
-        
+        {justSubmitted && justDropped && <div className="after-drop-bg">
+          <div className="after-submit">
+            <MetaForm file={file}/>
+          </div>
+      </div>}
+
 
     </div>
   );

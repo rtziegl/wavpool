@@ -118,13 +118,27 @@
   margin: auto;
 }
 
+.after-submit{
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  margin: auto;
+  margin-top: 100px;
+}
+
 .after-drop-right {
   width: 65%;
+}
+
+.meta-title{
+  text-decoration: underline;
+  margin-bottom: 5px;
 }
 
 .meta-form {
   margin-top: 30px;
 }
+
 
 .meta-form label {
   display: flex;

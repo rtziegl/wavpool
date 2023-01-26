@@ -24,6 +24,7 @@ export default function MetaForm(file) {
 
     return (
         <form onSubmit={handleSubmit} className="meta-form">
+            <h2 className="meta-title">Metadata</h2>
             <div>
                 <label htmlFor="title">Title</label>
                 <input
