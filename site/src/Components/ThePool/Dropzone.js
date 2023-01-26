@@ -25,6 +25,9 @@ export default function DragDropFile() {
   // Ref.
   const inputRef = useRef(null);
 
+  //Cid state.
+  const [cid, setCid] = useState("")
+
   // Handles drag events.
   const handleDrag = function (e) {
     e.preventDefault();
@@ -109,9 +112,13 @@ export default function DragDropFile() {
   const commitFileToIPFS = async () => {
     const node = await IPFS.create({repo: 'ok' + Math.random()})
     const results = await node.add(file)
+    setCid(results.path)
+   
+    
 
     console.log(results)
     console.log(results.path)
+    console.log(cid)
   }
 
   return (
@@ -154,6 +161,7 @@ export default function DragDropFile() {
         <h4>or</h4>
         <div className="extra-button-space-1">
                 <button className="button-59" role="button" type="submit" onClick={commitFileToIPFS}>Upload</button>
+                {cid}
             </div>
         </div>}
 

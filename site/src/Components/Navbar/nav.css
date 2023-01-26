@@ -1,48 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap');
 
-*{
+* {
     box-sizing: border-box;
-    margin:0;
-    padding:0;
+    margin: 0;
+    padding: 0;
     background-color: white;
     font-family: 'Montserrat', sans-serif;
 }
 
-.head{
+.head {
     display: flex;
     justify-content: flex-end;
     align-items: center;
     padding: 22px 11%;
 }
 
-.logo{
+.logo {
     cursor: pointer;
     margin-right: auto;
 }
 
-li , a {
+li,
+a {
     text-decoration: none;
-    color:black
+    color: black
 }
 
-.nav_links{
+.nav_links {
     list-style: none;
 }
 
-.nav_links li{
+.nav_links li {
     display: inline-block;
     padding: 0px 15px;
 }
 
-.nav_links li a{
+.nav_links li a {
     transition: all 0.3s ease 0s;
 }
 
-.nav_links li a:hover{
-    color:#A7117A;
+.nav_links li a:hover {
+    color: #A7117A;
 }
 
-.account{
+.account {
     display: inline-block;
     padding: 0px 20px;
     cursor: auto;

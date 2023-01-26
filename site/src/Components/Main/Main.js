@@ -1,13 +1,13 @@
 import './main.css';
 import './main-button.css'
 import './main-header.css'
-import React, {useEffect, useState} from "react";
-const {ethers} = require("ethers");
+import React, { useEffect, useState } from "react";
+const { ethers } = require("ethers");
 
-export default function Main(){
+export default function Main() {
     const [remainingSpots, updateRemaining] = useState("Unkown");
 
-    return(
+    return (
         <div>
             <div className='wave-text'>
                 <div className='content'>
@@ -36,7 +36,7 @@ export default function Main(){
                             </div>
                             <div className='box-header2'>Spots Remaining</div>
                             <li className='main-li'>{remainingSpots}</li>
-                        </div>     
+                        </div>
                     </div>
                 </div>
             </div>

@@ -23,26 +23,26 @@
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-  }
-  
-  .button-59:focus {
+}
+
+.button-59:focus {
     color: #171e29;
-  }
-  
-  .button-59:hover {
+}
+
+.button-59:hover {
     border-color: #A7117A;
     color: #A7117A;
     fill: #A7117A;
-  }
-  
-  .button-59:active {
+}
+
+.button-59:active {
     border-color: #A7117A;
     color: #A7117A;
     fill: #A7117A;
-  }
-  
-  @media (min-width: 768px) {
+}
+
+@media (min-width: 768px) {
     .button-59 {
-      min-width: 120px;
+        min-width: 120px;
     }
-  }
+}
