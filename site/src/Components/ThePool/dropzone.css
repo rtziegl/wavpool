@@ -123,20 +123,25 @@
   justify-content: center;
   align-content: center;
   margin: auto;
-  margin-top: 100px;
+  padding: 0;
+  margin-top: 160px;
 }
 
 .after-drop-right {
   width: 65%;
 }
 
-.meta-title{
+.meta-title {
   text-decoration: underline;
   margin-bottom: 5px;
+  margin-top: 10px;
+  position: relative;
+  
 }
 
 .meta-form {
-  margin-top: 30px;
+  margin-top: 0px;
+  padding-top: 0px;
 }
 
 
@@ -165,6 +170,7 @@ input {
   box-sizing: border-box;
   outline-color: #A7117A;
   padding-bottom: 6px;
+  
 }
 
 textarea {
