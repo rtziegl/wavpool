@@ -1,22 +1,23 @@
 import React, { useEffect, useState, useRef} from "react";
 
-export default function MetaForm(file) {
+export default function MetaForm({cid}) {
     const [title, setTitle] = useState('');
     const [producer, setProducer] = useState('');
     const [key, setKey] = useState('');
     const [bpm, setBPM] = useState('');
     const [description, setDescription] = useState('');
+    const [beat, setBeat] = useState('');
 
     function handleSubmit(event) {
         event.preventDefault();
-        var name = file.file.name
+        setBeat(cid.current)
         var jsonData = {
             title,
             producer,
             key,
             bpm,
             description,
-            name,
+            beat,
         }
         
         console.log(JSON.stringify(jsonData))

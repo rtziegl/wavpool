@@ -26,7 +26,8 @@ export default function DragDropFile() {
   const inputRef = useRef(null);
 
   //Cid state.
-  const [cid, setCid] = useState("")
+  //const [cid, setCid] = useState("")
+  const cid = useRef(null);
 
   // Handles drag events.
   const handleDrag = function (e) {
@@ -114,7 +115,7 @@ export default function DragDropFile() {
     const results = await node.add(file)
 
     // Setting CID.
-    setCid(results.path)
+    cid.current = results.path
 
     // Setting Metadata Screen.
     setSubmit(true)
@@ -123,7 +124,8 @@ export default function DragDropFile() {
 
     console.log(results)
     console.log(results.path)
-    console.log(cid)
+    console.log({cid})
+
   }
 
   return (
@@ -159,7 +161,7 @@ export default function DragDropFile() {
 
         {justSubmitted && justDropped && <div className="after-drop-bg">
           <div className="after-submit">
-            <MetaForm file={file}/>
+            <MetaForm cid={cid}/>
           </div>
       </div>}
 
