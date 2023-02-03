@@ -22,11 +22,10 @@ export default function DragDropFile() {
   // Audio state.
   const [audioObject, setAudio] = useState()
 
-  // Ref.
+  // Input ref.
   const inputRef = useRef(null);
 
-  //Cid state.
-  //const [cid, setCid] = useState("")
+  //Cid ref.
   const cid = useRef(null);
 
   // Handles drag events.
@@ -115,7 +114,8 @@ export default function DragDropFile() {
     const results = await node.add(file)
 
     // Setting CID.
-    cid.current = results.path
+    cid.current = "ipfs://"
+    cid.current += results.path
 
     // Setting Metadata Screen.
     setSubmit(true)
@@ -161,7 +161,7 @@ export default function DragDropFile() {
 
         {justSubmitted && justDropped && <div className="after-drop-bg">
           <div className="after-submit">
-            <MetaForm cid={cid}/>
+            <MetaForm cid={cid.current}/>
           </div>
       </div>}
 

@@ -6,11 +6,10 @@ export default function MetaForm({cid}) {
     const [key, setKey] = useState('');
     const [bpm, setBPM] = useState('');
     const [description, setDescription] = useState('');
-    const [beat, setBeat] = useState('');
+    const [beat, setBeat] = useState(cid)
 
     function handleSubmit(event) {
         event.preventDefault();
-        setBeat(cid.current)
         var jsonData = {
             title,
             producer,
@@ -21,6 +20,7 @@ export default function MetaForm({cid}) {
         }
         
         console.log(JSON.stringify(jsonData))
+        const finalizedData = JSON.stringify(jsonData)
     }
 
     return (
