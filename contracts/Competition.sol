@@ -9,6 +9,11 @@ contract Competition is Ownable{
     uint public spotsInCompetition = 100;
     uint256 private _cost = 0.01 ether; 
 
+    modifier isInComp(){
+        require(checkIfUserInCompetition(), "User is not a part of the current competition and therefore cannot mint.");
+        _;
+    }
+
     function checkIfUserInCompetition() private view returns (bool) {
         for (uint256 i = 0; i < usersInCompetition.length; i++) {
             if(msg.sender == usersInCompetition[i]) 
