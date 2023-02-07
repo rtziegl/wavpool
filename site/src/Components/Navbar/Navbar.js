@@ -65,7 +65,7 @@ export default function Navbar() {
 
   return (
     <div className='head'>
-      <div className="logo"><Link to='/'>wav pool</Link></div>
+      <div className="logo"><Link to='/'>wavpool</Link></div>
       <nav>
         <ul className="nav_links">
           <CustomLink to='/thepool'>the pool</CustomLink>

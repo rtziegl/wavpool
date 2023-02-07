@@ -13,8 +13,7 @@ contract Competition is ERC721URIStorage, Ownable{
     uint public spotsInCompetition = 100;
     uint256 private _cost = 0.01 ether; 
 
-    constructor() ERC721("MyNFT", "WPOOL") {
-    }
+    constructor() ERC721("wavpool NFT", "WAVP") {}
 
     modifier isInComp(){
         require(checkIfUserInCompetition(), "User is not a part of the current competition and therefore cannot mint.");
@@ -31,6 +30,7 @@ contract Competition is ERC721URIStorage, Ownable{
 
     function buyin() public payable{
         require(!checkIfUserInCompetition(), "User has already purchased a ticket.");
+        require(spotsInCompetition > 0, "No spots left in competition.");
         require(msg.value == _cost, "Incorrect payment amount");
         usersInCompetition.push(msg.sender);
         spotsInCompetition -= 1;
@@ -54,7 +54,7 @@ contract Competition is ERC721URIStorage, Ownable{
         return spotsInCompetition;
     }
 
-    function getBalanceOfContract() public view returns  (uint){
+    function getBalanceOfContract() public view onlyOwner returns  (uint){
         return address(this).balance;
     }
 
