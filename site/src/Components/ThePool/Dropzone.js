@@ -52,7 +52,7 @@ export default function DragDropFile() {
       let file = e.dataTransfer.files[0];
       console.log(file)
 
-      if (file.type != "audio/mpeg" && file.type != "audio/wav"){
+      if (file.type != "audio/mpeg" && file.type != "audio/wav") {
         alert("Wrong file type, must be mp3 or wav.")
         setDropped(false)
       }
@@ -73,7 +73,7 @@ export default function DragDropFile() {
       let file = e.target.files[0];
       console.log(file)
 
-      if (file.type != "audio/mpeg" && file.type != "audio/wav"){
+      if (file.type != "audio/mpeg" && file.type != "audio/wav") {
         alert("Wrong file type, must be mp3 or wav.")
         setDropped(false)
       }
@@ -110,7 +110,7 @@ export default function DragDropFile() {
 
   // Add audio file to IPFS and get the cid.
   const commitFileToIPFS = async () => {
-    const node = await IPFS.create({repo: 'ok' + Math.random()})
+    const node = await IPFS.create({ repo: 'ok' + Math.random() })
     const results = await node.add(file)
 
     // Setting CID.
@@ -119,12 +119,10 @@ export default function DragDropFile() {
 
     // Setting Metadata Screen.
     setSubmit(true)
-   
-    
 
     console.log(results)
     console.log(results.path)
-    console.log({cid})
+    console.log({ cid })
 
   }
 
@@ -144,8 +142,8 @@ export default function DragDropFile() {
       </form></div>}
 
       {correctFileType && !justSubmitted && <div className="after-drop-bg">
-      <h3>File Preview</h3>
-      <div className="after-drop-top">
+        <h3>File Preview</h3>
+        <div className="after-drop-top">
           <div className="play-button">
             {!click && <div onClick={play}><FaPlayCircle /></div>}
             {click && <div onClick={pause}><FaPauseCircle /></div>}
@@ -155,14 +153,14 @@ export default function DragDropFile() {
         <button className="upload-button-1" onClick={onButtonClick}>Change File</button>
         <h4>or</h4>
         <div className="extra-button-space-1">
-                <button className="button-59" role="button" type="submit" onClick={commitFileToIPFS}>Upload</button>
-            </div>
-        </div>}
+          <button className="button-59" role="button" type="submit" onClick={commitFileToIPFS}>Upload</button>
+        </div>
+      </div>}
 
-        {justSubmitted && justDropped && <div className="after-drop-bg">
-          <div className="after-submit">
-            <MetaForm cid={cid.current}/>
-          </div>
+      {justSubmitted && justDropped && <div className="after-drop-bg">
+        <div className="after-submit">
+          <MetaForm cid={cid.current} />
+        </div>
       </div>}
 
 

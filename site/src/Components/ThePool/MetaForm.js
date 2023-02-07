@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef} from "react";
+import React, { useEffect, useState, useRef } from "react";
 import * as IPFS from "ipfs-core";
 
-export default function MetaForm({cid}) {
+export default function MetaForm({ cid }) {
     const [title, setTitle] = useState('');
     const [producer, setProducer] = useState('');
     const [key, setKey] = useState('');
@@ -11,7 +11,7 @@ export default function MetaForm({cid}) {
 
     // Adding metaData including original file IPFS to IPFS.
     const commitJsonToIPFS = async (json) => {
-        const node = await IPFS.create({repo: 'ok' + Math.random()})
+        const node = await IPFS.create({ repo: 'ok' + Math.random() })
         const results = await node.add(json)
         let nftUri = 'ipfs://'
         nftUri += results.path
@@ -28,7 +28,7 @@ export default function MetaForm({cid}) {
             description,
             beat,
         }
-        
+
         console.log(JSON.stringify(jsonData))
         const finalizedData = JSON.stringify(jsonData)
         commitJsonToIPFS(finalizedData)

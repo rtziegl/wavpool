@@ -10,7 +10,7 @@ contract Competition is ERC721URIStorage, Ownable{
     Counters.Counter private _tokenIds;
 
     address[] public usersInCompetition;
-    uint public spotsInCompetition = 100;
+    uint public spotsInCompetition = 50;
     uint256 private _cost = 0.01 ether; 
 
     constructor() ERC721("wavpool NFT", "WAVP") {}
