@@ -1,26 +1,37 @@
 const { ethers } = require('hardhat');
 const main = async () => {
     const [owner, randomPerson] = await hre.ethers.getSigners();
-    const careerFairFactory = await hre.ethers.getContractFactory("Minter");
-    const careerFairContract = await careerFairFactory.deploy();
-    await careerFairContract.deployed();
+    const metadata = "https://opensea-creatures-api.herokuapp.com/api/creature/1"
 
-    console.log("Contract deployed to:", careerFairContract.address);
+    const compFactory = await hre.ethers.getContractFactory("Competition");
+    const compContract = await compFactory.deploy();
+    await compContract.deployed();
+
+    /*const mintFactory = await hre.ethers.getContractFactory("Minter");
+    const mintContract = await mintFactory.deploy();
+    await mintContract.deployed();*/
+
     console.log("Contract deployed by:", owner.address);
-    console.log(randomPerson.address);
-
 
     var buyTXoptions = { value: hre.ethers.utils.parseEther('0.01') }
-    await careerFairContract.buyin(buyTXoptions)
-    await careerFairContract.connect(randomPerson).buyin(buyTXoptions)
-    console.log(await careerFairContract.getAllFromCompetition())
-    console.log(await careerFairContract.getSpotsRemaining())
-    console.log(await careerFairContract.getBalanceOfContract())
-    await careerFairContract.connect(randomPerson).resetCompetition()
-    console.log(await careerFairContract.getAllFromCompetition())
-    console.log(await careerFairContract.getSpotsRemaining())
-    
+    await compContract.buyin(buyTXoptions)
+    console.log(await compContract.getAllFromCompetition())
+    console.log(await compContract.getSpotsRemaining())
 
+    // Minting the token
+    const transaction= await compContract.mintNFT(
+        metadata,
+        {
+          gasLimit: 500_000,
+        },
+      )
+    const tx = await transaction.wait() 
+    const event = tx.events[0];
+    const value = event.args[2];
+    const tokenId = value.toNumber(); // Getting the tokenID
+    const tokenURI = await compContract.tokenURI(tokenId) // Using the tokenURI from ERC721 to retrieve de metadata
+    console.log(tokenId)
+    console.log(tokenURI)
   };
   
   const runMain = async () => {
