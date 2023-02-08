@@ -5,6 +5,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
+// TODO
+// 1. Restrict ability to mint only 1 nft per buy in. (Struct holding nft count for e competitor)
+// 2. Possible Comp struct holding the array of users and competitionStarted. 
+// 2 cont. Need identifier for each competition.  Possible use of Counters.counter.
+
 contract Competition is ERC721URIStorage, Ownable{
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -79,6 +84,7 @@ contract Competition is ERC721URIStorage, Ownable{
         competitionStarted = true;
     }
 
+    // Withdraws money from contract to owner.
     function withdrawMoney() public onlyOwner {
         address payable to = payable(msg.sender);
         to.transfer(getBalanceOfContract());
