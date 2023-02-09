@@ -13,31 +13,31 @@ const main = async () => {
 
     console.log("Contract deployed by:", owner.address);
 
-    console.log(await compContract.returnMap())
+    console.log(await compContract.getCompetitionStats())
     var buyTXoptions = { value: hre.ethers.utils.parseEther('0.01') }
     var btx = hre.ethers.utils.parseEther('0.01') 
-    await compContract.startCompetition(50, btx)
+    await compContract.startCompetition(50, btx, "Beat")
     await compContract.buyin(buyTXoptions)
     await compContract.connect(randomPerson).buyin(buyTXoptions)
     console.log(await compContract.getAllFromCompetition())
     console.log(await compContract.getSpotsRemaining())
-    console.log(await compContract.returnMap())
+    console.log(await compContract.getCompetitionStats())
 
-    await compContract.startCompetition(50, btx)
+    await compContract.startCompetition(50, btx, "Beat")
     await compContract.buyin(buyTXoptions)
     await compContract.connect(randomPerson).buyin(buyTXoptions)
     console.log(await compContract.getAllFromCompetition())
     console.log(await compContract.getSpotsRemaining())
-    console.log(await compContract.returnMap())
+    console.log(await compContract.getCompetitionStats())
 
     // Minting the token
     const transaction= await compContract.mintNFT(
-        metadata,
-        {
-          gasLimit: 500_000,
-        },
-      )
-    const tx = await transaction.wait() 
+      metadata,
+      {
+        gasLimit: 500_000,
+      },
+    )
+  const tx = await transaction.wait() 
 
     const transaction2= await compContract.mintNFT(
       metadata,

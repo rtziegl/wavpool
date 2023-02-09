@@ -5,11 +5,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-// TODO
-// 1. Restrict ability to mint only 1 nft per buy in. (Struct holding nft count for e competitor)
-// 2. Possible Comp struct holding the array of users and competitionStarted.
-// 2 cont. Need identifier for each competition.  Possible use of Counters.counter.
-
 contract Competition is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -27,11 +22,14 @@ contract Competition is ERC721URIStorage, Ownable {
         address[] usersInComp;
         uint256 costToJoin;
         uint256 totalSpotsInComp;
-        bool isCompStarted;
         uint256 compId;
+        bool isCompStarted;
+        string typeOfComp;
     }
 
-    constructor() ERC721("wavpool NFT", "WAVP") {}
+    constructor() ERC721("wavpool NFT", "WAVP") {
+        _comps[_compIds].isCompStarted = false;
+    }
 
     // Ensures user is in competition before being able to mint an nft.
     modifier isInComp() {
@@ -93,38 +91,48 @@ contract Competition is ERC721URIStorage, Ownable {
         return newItemId;
     }
 
-    // Returns list of all competitors.
-    function getAllFromCompetition() public view returns (address[] memory) {
-        return _comps[_compIds].usersInComp;
+    // Starts/resets competition.
+    function startCompetition(
+        uint256 spots,
+        uint256 cost,
+        string memory typeComp
+    ) public onlyOwner {
+        if (_comps[_compIds].usersInComp.length > 0) _compIds += 1;
+        delete _comps[_compIds].usersInComp;
+        _comps[_compIds].totalSpotsInComp = spots;
+        _comps[_compIds].typeOfComp = typeComp;
+        _comps[_compIds].costToJoin = cost;
+        _comps[_compIds].compId = _compIds;
+        _comps[_compIds].isCompStarted = true;
     }
 
-    // Returns amount of spots remaining in current competition.
-    function getSpotsRemaining() public view returns (uint256) {
-        return _comps[_compIds].totalSpotsInComp;
-    }
-
-    // Returns true if competition is started and false if competition has not started.
-    function getStatusOfCompetition() public view returns (bool) {
-        return _comps[_compIds].isCompStarted;
+    // Returns all stats.
+    // Competition Id (uint), All users in competition array (address[]), Type of competition (string),
+    // Total spots in competiion (uint), and Cost to join the competition (uint).
+    // spots, cost , and type set by owner for now.
+    function getCompetitionStats()
+        public
+        view
+        returns (
+            uint256,
+            address[] memory,
+            string memory,
+            uint256,
+            uint256
+        )
+    {
+        return (
+            _comps[_compIds].compId,
+            _comps[_compIds].usersInComp,
+            _comps[_compIds].typeOfComp,
+            _comps[_compIds].totalSpotsInComp,
+            _comps[_compIds].costToJoin
+        );
     }
 
     // Returns current balance of contract.
     function getBalanceOfContract() public view onlyOwner returns (uint256) {
         return address(this).balance;
-    }
-
-    // Starts/resets competition.
-    function startCompetition(uint256 spots, uint256 cost) public onlyOwner {
-        if (_comps[_compIds].usersInComp.length > 0) _compIds += 1;
-        delete _comps[_compIds].usersInComp;
-        _comps[_compIds].totalSpotsInComp = spots;
-        _comps[_compIds].isCompStarted = true;
-        _comps[_compIds].costToJoin = cost;
-        _comps[_compIds].compId = _compIds;
-    }
-
-    function returnMap() public view returns (uint256) {
-        return _comps[_compIds].compId;
     }
 
     // Withdraws money from contract to owner.
