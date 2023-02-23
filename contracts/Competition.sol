@@ -14,7 +14,7 @@ contract Competition is ERC721URIStorage, Ownable {
     uint256 private _compIds;
 
     struct Competitor {
-        address users;
+        address user;
         uint256 nftCount;
     }
 
