@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as IPFS from "ipfs-core";
+import { ethers } from "ethers";
+import abi from "./BEATS-ETH/artifacts/contracts/Competition.sol/Competition.json";
 
 export default function MetaForm({ cid }) {
     const [title, setTitle] = useState('');
@@ -7,7 +9,12 @@ export default function MetaForm({ cid }) {
     const [key, setKey] = useState('');
     const [bpm, setBPM] = useState('');
     const [description, setDescription] = useState('');
-    const [beat, setBeat] = useState(cid)
+    const [beat, setBeat] = useState(cid);
+
+    const [currentAccount, setCurrentAccount] = useState("");
+    const contractAddress = "0xfcA9C127Dc84B8a950e75de7d778B2A381e23BC6";
+    const contractABI = abi.abi;
+    console.log(contractABI);
 
     // Adding metaData including original file IPFS to IPFS.
     const commitJsonToIPFS = async (json) => {
