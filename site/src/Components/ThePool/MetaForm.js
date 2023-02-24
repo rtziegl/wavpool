@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import * as IPFS from "ipfs-core";
 import { ethers } from "ethers";
-import abi from "./BEATS-ETH/artifacts/contracts/Competition.sol/Competition.json";
+import abi from "../../contract_utils/Competition.json";
+
 
 export default function MetaForm({ cid }) {
     const [title, setTitle] = useState('');
