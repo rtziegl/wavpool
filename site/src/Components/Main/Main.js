@@ -2,10 +2,43 @@ import './main.css';
 import './main-button.css'
 import './main-header.css'
 import React, { useEffect, useState } from "react";
+import abi from "../../contract_utils/Competition.json";
 const { ethers } = require("ethers");
 
 export default function Main() {
-    const [remainingSpots, updateRemaining] = useState("Unkown");
+    const [remainingSpots, updateRemaining] = useState("Competition hasn't started.");
+    const contractAddress = "0xfcA9C127Dc84B8a950e75de7d778B2A381e23BC6";
+    const contractABI = abi.abi;
+
+    //Gets competition stats from Competition.sol.
+    const getCompStats = async () => {
+        try {
+            const { ethereum } = window;
+
+            if (ethereum) {
+                const provider = new ethers.providers.Web3Provider(ethereum);
+                const signer = provider.getSigner();
+                const compContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                let compinfo = await compContract.getCompetitionStats()
+                console.log(compinfo[1])
+                if (compinfo[1].length == 0) {
+                    updateRemaining("Competition hasn't started yet.")
+                }
+                else {
+                    updateRemaining(parseInt(compinfo[3]._hex, 16))
+                }
+
+
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    useEffect(() => {
+        getCompStats()
+    }, [])
 
     return (
         <div>
