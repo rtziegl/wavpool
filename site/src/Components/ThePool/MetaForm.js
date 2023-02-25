@@ -15,7 +15,28 @@ export default function MetaForm({ cid }) {
     const [currentAccount, setCurrentAccount] = useState("");
     const contractAddress = "0xfcA9C127Dc84B8a950e75de7d778B2A381e23BC6";
     const contractABI = abi.abi;
-    console.log(contractABI);
+
+    const mint = async (nftUri) => {
+        try {
+            const { ethereum } = window;
+
+            if (ethereum) {
+                const provider = new ethers.providers.Web3Provider(ethereum);
+                const signer = provider.getSigner();
+                const compContract = new ethers.Contract(contractAddress, contractABI, signer);
+
+                // Minting the token.
+                const transaction = await compContract.mintNFT(
+                    nftUri,
+                    {
+                        gasLimit: 500_000,
+                    },
+                )
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     // Adding metaData including original file IPFS to IPFS.
     const commitJsonToIPFS = async (json) => {
@@ -24,6 +45,7 @@ export default function MetaForm({ cid }) {
         let nftUri = 'ipfs://'
         nftUri += results.path
         console.log(nftUri)
+        mint(nftUri)
     }
 
     function handleSubmit(event) {
