@@ -16,6 +16,8 @@ contract Competition is ERC721URIStorage, Ownable {
     struct Competitor {
         address user;
         uint256 nftCount;
+        uint256 allotedVotes;
+        uint256 gainedVotes;
     }
 
     struct Comp {
@@ -49,6 +51,15 @@ contract Competition is ERC721URIStorage, Ownable {
         _;
     }
 
+    // Ensures user has not already voted.
+    modifier canVote(){
+        require(
+            _users[msg.sender].allotedVotes == 1,
+            "User has already voted.  Can only vote once per competition."
+        );
+        _;
+    }
+
     // Checks if user is in the competition.
     function checkIfUserInCompetition() private view returns (bool) {
         for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
@@ -71,7 +82,7 @@ contract Competition is ERC721URIStorage, Ownable {
             msg.value == _comps[_compIds].costToJoin,
             "Incorrect payment amount."
         );
-        _users[msg.sender] = Competitor(msg.sender, 0);
+        _users[msg.sender] = Competitor(msg.sender, 0, 1, 0);
         _comps[_compIds].usersInComp.push(msg.sender);
         _comps[_compIds].totalSpotsInComp -= 1;
     }
@@ -106,6 +117,15 @@ contract Competition is ERC721URIStorage, Ownable {
         _comps[_compIds].isCompStarted = true;
     }
 
+    // Allows users in competition to vote for a winning beat.
+    // Subtracts the one vote alloted on buyin (cannot vote again).
+    // Adds one vote to the user thats been voted for.
+    function vote(address voteFor) public isInComp canVote {
+        require(msg.sender != voteFor, "Not allowed to vote for yourself to win.");
+        _users[msg.sender].allotedVotes -= 1;
+        _users[voteFor].gainedVotes += 1;
+    }
+
     // Returns all stats.
     // Competition Id (uint), All users in competition array (address[]), Type of competition (string),
     // Total spots in competiion (uint), and Cost to join the competition (uint).
@@ -118,7 +138,8 @@ contract Competition is ERC721URIStorage, Ownable {
             address[] memory,
             string memory,
             uint256,
-            uint256
+            uint256,
+            bool
         )
     {
         return (
@@ -126,9 +147,12 @@ contract Competition is ERC721URIStorage, Ownable {
             _comps[_compIds].usersInComp,
             _comps[_compIds].typeOfComp,
             _comps[_compIds].totalSpotsInComp,
-            _comps[_compIds].costToJoin
+            _comps[_compIds].costToJoin,
+            _comps[_compIds].isCompStarted
         );
     }
+
+    function breakTie(address vote) public onlyOwner
 
     // Returns current balance of contract.
     function getBalanceOfContract() public view onlyOwner returns (uint256) {
