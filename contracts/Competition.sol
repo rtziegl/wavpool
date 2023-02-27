@@ -13,6 +13,12 @@ contract Competition is ERC721URIStorage, Ownable {
     mapping(uint256 => Comp) private _comps;
     uint256 private _compIds;
 
+    address private _voteLeader;
+    uint256 private _amtOfVotesForLeader;
+    address[] private _leaders;
+    uint256 private _leaderIndex;
+    uint256 private _leaderCount;
+
     struct Competitor {
         address user;
         uint256 nftCount;
@@ -52,7 +58,7 @@ contract Competition is ERC721URIStorage, Ownable {
     }
 
     // Ensures user has not already voted.
-    modifier canVote(){
+    modifier canVote() {
         require(
             _users[msg.sender].allotedVotes == 1,
             "User has already voted.  Can only vote once per competition."
@@ -102,14 +108,12 @@ contract Competition is ERC721URIStorage, Ownable {
         return newItemId;
     }
 
-    // Starts/resets competition.
+    // Starts competition.
     function startCompetition(
         uint256 spots,
         uint256 cost,
         string memory typeComp
     ) public onlyOwner {
-        if (_comps[_compIds].usersInComp.length > 0) _compIds += 1;
-        delete _comps[_compIds].usersInComp;
         _comps[_compIds].totalSpotsInComp = spots;
         _comps[_compIds].typeOfComp = typeComp;
         _comps[_compIds].costToJoin = cost;
@@ -117,11 +121,44 @@ contract Competition is ERC721URIStorage, Ownable {
         _comps[_compIds].isCompStarted = true;
     }
 
+    function endCompetition() public onlyOwner{
+        // Only three winners allowed.
+        if (_leaderCount <= 2) {
+            // Finds leader.
+            for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
+                if (
+                    _users[_comps[_compIds].usersInComp[i]].gainedVotes >
+                    _amtOfVotesForLeader
+                ) {
+                    _voteLeader = _users[_comps[_compIds].usersInComp[i]].user;
+                    _amtOfVotesForLeader = _users[
+                        _comps[_compIds].usersInComp[i]
+                    ].gainedVotes;
+                    _leaderIndex = i;
+                }
+            }
+            // Adds top vote leader, tie goes to earlier buyin.
+            _leaders.push(_voteLeader);
+            // Deletes user from comp.
+            delete _comps[_compIds].usersInComp[_leaderIndex];
+            // Winner found.
+            _leaderCount += 1;
+            endCompetition();
+        }
+
+        //Delete whole array storing users for competion.
+        delete _comps[_compIds].usersInComp;
+        _compIds += 1;
+    }
+
     // Allows users in competition to vote for a winning beat.
     // Subtracts the one vote alloted on buyin (cannot vote again).
     // Adds one vote to the user thats been voted for.
     function vote(address voteFor) public isInComp canVote {
-        require(msg.sender != voteFor, "Not allowed to vote for yourself to win.");
+        require(
+            msg.sender != voteFor,
+            "Not allowed to vote for yourself to win."
+        );
         _users[msg.sender].allotedVotes -= 1;
         _users[voteFor].gainedVotes += 1;
     }
@@ -152,7 +189,10 @@ contract Competition is ERC721URIStorage, Ownable {
         );
     }
 
-    function breakTie(address vote) public onlyOwner
+    // Allows owner to break a tie if not everyone votes.
+    function breakTie(address voteFor) public onlyOwner {
+        _users[voteFor].gainedVotes += 1;
+    }
 
     // Returns current balance of contract.
     function getBalanceOfContract() public view onlyOwner returns (uint256) {
