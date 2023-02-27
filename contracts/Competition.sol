@@ -8,22 +8,23 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract Competition is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-
     mapping(address => Competitor) private _users;
     mapping(uint256 => Comp) private _comps;
     uint256 private _compIds;
 
     address private _voteLeader;
-    uint256 private _amtOfVotesForLeader;
+    int256 private _amtOfVotesForLeader;
     address[] private _leaders;
     uint256 private _leaderIndex;
     uint256 private _leaderCount;
+
+    address constant private _DELETEDUSER = 0x0000000000000000000000000000000000000000;
 
     struct Competitor {
         address user;
         uint256 nftCount;
         uint256 allotedVotes;
-        uint256 gainedVotes;
+        int256 gainedVotes;
     }
 
     struct Comp {
@@ -128,12 +129,12 @@ contract Competition is ERC721URIStorage, Ownable {
     // Ends a competition and finds winners.
     function endCompetition() public onlyOwner{
         // Only three winners allowed.
-        if (_leaderCount <= 2) {
+        if (_leaderCount <=2) {
             // Finds leader.
             for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
                 if (
                     _users[_comps[_compIds].usersInComp[i]].gainedVotes >
-                    _amtOfVotesForLeader
+                    _amtOfVotesForLeader && _comps[_compIds].usersInComp[i] != _DELETEDUSER
                 ) {
                     _voteLeader = _users[_comps[_compIds].usersInComp[i]].user;
                     _amtOfVotesForLeader = _users[
@@ -146,14 +147,19 @@ contract Competition is ERC721URIStorage, Ownable {
             _leaders.push(_voteLeader);
             // Deletes user from comp.
             delete _comps[_compIds].usersInComp[_leaderIndex];
+            // Resets votes for leader to -1 which allows 2nd and third to be no votes 
+            // just whoever bought in first (rare case).
+            _amtOfVotesForLeader = -1;
+            console.log("Leader", _leaderIndex);
             // Winner found.
             _leaderCount += 1;
             endCompetition();
         }
-
-        //Delete whole array storing users for competion.
-        delete _comps[_compIds].usersInComp;
-        _compIds += 1;
+        else{
+            //Delete whole array storing users for competion.
+            //delete _comps[_compIds].usersInComp;
+            _compIds += 1;
+        }
     }
 
     // Allows users in competition to vote for a winning beat.
@@ -192,6 +198,10 @@ contract Competition is ERC721URIStorage, Ownable {
             _comps[_compIds].costToJoin,
             _comps[_compIds].isCompStarted
         );
+    }
+
+    function getWinners() public view returns(address[] memory){
+        return _leaders;
     }
 
     // Allows owner to break a tie if not everyone votes.
