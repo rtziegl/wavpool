@@ -18,7 +18,8 @@ contract Competition is ERC721URIStorage, Ownable {
     uint256 private _leaderIndex;
     uint256 private _leaderCount;
 
-    address constant private _DELETEDUSER = 0x0000000000000000000000000000000000000000;
+    address private constant _DELETEDUSER =
+        0x0000000000000000000000000000000000000000;
 
     struct Competitor {
         address user;
@@ -38,6 +39,15 @@ contract Competition is ERC721URIStorage, Ownable {
 
     constructor() ERC721("wavpool NFT", "WAVP") {
         _comps[_compIds].isCompStarted = false;
+    }
+
+    // Ensures owner doesn't start a new competition without ending last.
+    modifier hasNotEnded(){
+        require(
+            _comps[_compIds].isCompStarted == true,
+            "Owner cannot start a new competition while the current competition has not ended."
+        );
+        _;
     }
 
     // Ensures user is in competition before being able to mint an nft.
@@ -114,9 +124,16 @@ contract Competition is ERC721URIStorage, Ownable {
         uint256 spots,
         uint256 cost,
         string memory typeComp
-    ) public onlyOwner {
+    ) public onlyOwner hasNotEnded {
         address[] memory dummyArray;
-        _comps[_compIds] = Comp(dummyArray, cost, spots, _compIds, true, typeComp);
+        _comps[_compIds] = Comp(
+            dummyArray,
+            cost,
+            spots,
+            _compIds,
+            true,
+            typeComp
+        );
         /* Edit for test.
         _comps[_compIds].totalSpotsInComp = spots;
         _comps[_compIds].typeOfComp = typeComp;
@@ -127,14 +144,15 @@ contract Competition is ERC721URIStorage, Ownable {
     }
 
     // Ends a competition and finds winners.
-    function endCompetition() public onlyOwner{
+    function endCompetition() public onlyOwner {
         // Only three winners allowed.
-        if (_leaderCount <=2) {
+        if (_leaderCount <= 2) {
             // Finds leader.
             for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
                 if (
                     _users[_comps[_compIds].usersInComp[i]].gainedVotes >
-                    _amtOfVotesForLeader && _comps[_compIds].usersInComp[i] != _DELETEDUSER
+                    _amtOfVotesForLeader &&
+                    _comps[_compIds].usersInComp[i] != _DELETEDUSER
                 ) {
                     _voteLeader = _users[_comps[_compIds].usersInComp[i]].user;
                     _amtOfVotesForLeader = _users[
@@ -147,15 +165,14 @@ contract Competition is ERC721URIStorage, Ownable {
             _leaders.push(_voteLeader);
             // Deletes user from comp.
             delete _comps[_compIds].usersInComp[_leaderIndex];
-            // Resets votes for leader to -1 which allows 2nd and third to be no votes 
+            // Resets votes for leader to -1 which allows 2nd and third to be no votes
             // just whoever bought in first (rare case).
             _amtOfVotesForLeader = -1;
             console.log("Leader", _leaderIndex);
             // Winner found.
             _leaderCount += 1;
             endCompetition();
-        }
-        else{
+        } else {
             //Delete whole array storing users for competion.
             //delete _comps[_compIds].usersInComp;
             _compIds += 1;
@@ -200,13 +217,8 @@ contract Competition is ERC721URIStorage, Ownable {
         );
     }
 
-    function getWinners() public view returns(address[] memory){
+    function getWinners() public view returns (address[] memory) {
         return _leaders;
-    }
-
-    // Allows owner to break a tie if not everyone votes.
-    function breakTie(address voteFor) public onlyOwner {
-        _users[voteFor].gainedVotes += 1;
     }
 
     // Returns current balance of contract.
