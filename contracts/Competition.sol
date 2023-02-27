@@ -114,13 +114,18 @@ contract Competition is ERC721URIStorage, Ownable {
         uint256 cost,
         string memory typeComp
     ) public onlyOwner {
+        address[] memory dummyArray;
+        _comps[_compIds] = Comp(dummyArray, cost, spots, _compIds, true, typeComp);
+        /* Edit for test.
         _comps[_compIds].totalSpotsInComp = spots;
         _comps[_compIds].typeOfComp = typeComp;
         _comps[_compIds].costToJoin = cost;
         _comps[_compIds].compId = _compIds;
         _comps[_compIds].isCompStarted = true;
+        */
     }
 
+    // Ends a competition and finds winners.
     function endCompetition() public onlyOwner{
         // Only three winners allowed.
         if (_leaderCount <= 2) {
