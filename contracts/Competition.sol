@@ -41,15 +41,6 @@ contract Competition is ERC721URIStorage, Ownable {
         _comps[_compIds].isCompStarted = false;
     }
 
-    // Ensures owner doesn't start a new competition without ending last.
-    modifier hasNotEnded() {
-        require(
-            _comps[_compIds].isCompStarted == true,
-            "Owner cannot start a new competition while the current competition has not ended."
-        );
-        _;
-    }
-
     // Ensures user is in competition before being able to mint an nft.
     modifier isInComp() {
         require(
@@ -124,7 +115,7 @@ contract Competition is ERC721URIStorage, Ownable {
         uint256 spots,
         uint256 cost,
         string memory typeComp
-    ) public onlyOwner hasNotEnded {
+    ) public onlyOwner {
         address[] memory dummyArray;
         _comps[_compIds] = Comp(
             dummyArray,
@@ -173,8 +164,17 @@ contract Competition is ERC721URIStorage, Ownable {
             _leaderCount += 1;
             endCompetition();
         } else {
-            //Delete whole array storing users for competion.
-            //delete _comps[_compIds].usersInComp;
+            // Half of competition buyin price stays in contract.  Other half dispersed among winners.
+            uint256 compBalance = (_comps[_compIds].costToJoin *
+                _comps[_compIds].usersInComp.length) / 2;
+
+            // Making payouts decreasing by half for 1st, 2nd, and 3rd place.
+            for (uint256 i = 0; i < _leaders.length; i++) {
+                compBalance /= 2;
+                address payable payoutAddress = payable(_leaders[i]);
+                payoutAddress.transfer(compBalance);
+            }
+
             _compIds += 1;
         }
     }
