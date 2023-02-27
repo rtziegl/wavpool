@@ -42,7 +42,7 @@ contract Competition is ERC721URIStorage, Ownable {
     }
 
     // Ensures owner doesn't start a new competition without ending last.
-    modifier hasNotEnded(){
+    modifier hasNotEnded() {
         require(
             _comps[_compIds].isCompStarted == true,
             "Owner cannot start a new competition while the current competition has not ended."
