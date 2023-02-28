@@ -125,13 +125,6 @@ contract Competition is ERC721URIStorage, Ownable {
             true,
             typeComp
         );
-        /* Edit for test.
-        _comps[_compIds].totalSpotsInComp = spots;
-        _comps[_compIds].typeOfComp = typeComp;
-        _comps[_compIds].costToJoin = cost;
-        _comps[_compIds].compId = _compIds;
-        _comps[_compIds].isCompStarted = true;
-        */
     }
 
     // Ends a competition and finds winners.
