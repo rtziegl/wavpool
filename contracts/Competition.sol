@@ -14,7 +14,6 @@ contract Competition is ERC721URIStorage, Ownable {
 
     address private _voteLeader;
     int256 private _amtOfVotesForLeader;
-    address[] private _leaders;
     uint256 private _leaderIndex;
     uint256 private _leaderCount;
 
@@ -30,6 +29,7 @@ contract Competition is ERC721URIStorage, Ownable {
 
     struct Comp {
         address[] usersInComp;
+        address[] winners;
         uint256 costToJoin;
         uint256 totalSpotsInComp;
         uint256 compId;
@@ -119,6 +119,7 @@ contract Competition is ERC721URIStorage, Ownable {
         address[] memory dummyArray;
         _comps[_compIds] = Comp(
             dummyArray,
+            dummyArray,
             cost,
             spots,
             _compIds,
@@ -146,7 +147,7 @@ contract Competition is ERC721URIStorage, Ownable {
                 }
             }
             // Adds top vote leader, tie goes to earlier buyin.
-            _leaders.push(_voteLeader);
+            _comps[_compIds].winners.push(_voteLeader);
             // Deletes user from comp.
             delete _comps[_compIds].usersInComp[_leaderIndex];
             // Resets votes for leader to -1 which allows 2nd and third to be no votes
@@ -162,12 +163,13 @@ contract Competition is ERC721URIStorage, Ownable {
                 _comps[_compIds].usersInComp.length) / 2;
 
             // Making payouts decreasing by half for 1st, 2nd, and 3rd place.
-            for (uint256 i = 0; i < _leaders.length; i++) {
+            for (uint256 i = 0; i < _comps[_compIds].winners.length; i++) {
                 compBalance /= 2;
-                address payable payoutAddress = payable(_leaders[i]);
+                address payable payoutAddress = payable(_comps[_compIds].winners[i]);
                 payoutAddress.transfer(compBalance);
             }
 
+            //Increasing ID for next competition.
             _compIds += 1;
         }
     }
@@ -206,12 +208,9 @@ contract Competition is ERC721URIStorage, Ownable {
             _comps[_compIds].typeOfComp,
             _comps[_compIds].totalSpotsInComp,
             _comps[_compIds].costToJoin,
-            _comps[_compIds].isCompStarted
+            _comps[_compIds].isCompStarted,
+            _comps[_compIds].winners
         );
-    }
-
-    function getWinners() public view returns (address[] memory) {
-        return _leaders;
     }
 
     // Returns current balance of contract.
