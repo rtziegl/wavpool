@@ -24,8 +24,10 @@ contract Competition is ERC721URIStorage, Ownable {
     struct Competitor {
         address user;
         uint256 nftCount;
-        uint256 allotedVotes;
-        int256 gainedVotes;
+        uint256 allotedVotesPerComp;
+        int256 gainedVotesPerComp;
+        int256 gainedVotesAllTime;
+        uint256[3] amtOfLeaderPlacements;
     }
 
     struct Comp {
@@ -63,7 +65,7 @@ contract Competition is ERC721URIStorage, Ownable {
     // Ensures user has not already voted.
     modifier canVote() {
         require(
-            _users[msg.sender].allotedVotes == 1,
+            _users[msg.sender].allotedVotesPerComp == 1,
             "User has already voted.  Can only vote once per competition."
         );
         _;
@@ -75,6 +77,15 @@ contract Competition is ERC721URIStorage, Ownable {
             if (msg.sender == _comps[_compIds].usersInComp[i]) return true;
         }
         return false;
+    }
+
+    // Adds up total votes for each competitor for each competition.
+    function addUpVotes() private {
+        for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
+            _users[_comps[_compIds].usersInComp[i]]
+                .gainedVotesAllTime += _users[_comps[_compIds].usersInComp[i]]
+                .gainedVotesPerComp;
+        }
     }
 
     // Allows for buyin to competition.
@@ -92,15 +103,17 @@ contract Competition is ERC721URIStorage, Ownable {
             "Incorrect payment amount."
         );
 
+        uint256[3] memory dummyArray;
         // If competitor doesn't exist make a new competitor.
-        if (_users[msg.sender].user != msg.sender){
-            _users[msg.sender] = Competitor(msg.sender, 0, 1, 0);
+        if (_users[msg.sender].user != msg.sender) {
+            _users[msg.sender] = Competitor(msg.sender, 0, 1, 0, 0, dummyArray);
             console.log("new");
         }
-        // If competitior does already exist reset their alloted votes and gained votes.
-        else{
-            _users[msg.sender].allotedVotes = 1;
-            _users[msg.sender].gainedVotes = 0;
+        // If competitior does already exist reset their alloted votes, gained votes and nft count.
+        else {
+            _users[msg.sender].allotedVotesPerComp = 1;
+            _users[msg.sender].gainedVotesPerComp = 0;
+            _users[msg.sender].nftCount = 0;
         }
 
         _comps[_compIds].usersInComp.push(msg.sender);
@@ -147,14 +160,14 @@ contract Competition is ERC721URIStorage, Ownable {
             // Finds leader.
             for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
                 if (
-                    _users[_comps[_compIds].usersInComp[i]].gainedVotes >
+                    _users[_comps[_compIds].usersInComp[i]].gainedVotesPerComp >
                     _amtOfVotesForLeader &&
                     _comps[_compIds].usersInComp[i] != _DELETEDUSER
                 ) {
                     _voteLeader = _users[_comps[_compIds].usersInComp[i]].user;
                     _amtOfVotesForLeader = _users[
                         _comps[_compIds].usersInComp[i]
-                    ].gainedVotes;
+                    ].gainedVotesPerComp;
                     _leaderIndex = i;
                 }
             }
@@ -165,7 +178,6 @@ contract Competition is ERC721URIStorage, Ownable {
             // Resets votes for leader to -1 which allows 2nd and third to be no votes
             // just whoever bought in first (rare case).
             _amtOfVotesForLeader = -1;
-            console.log("Leader", _leaderIndex);
             // Winner found.
             _leaderCount += 1;
             endCompetition();
@@ -177,12 +189,23 @@ contract Competition is ERC721URIStorage, Ownable {
             // Making payouts decreasing by half for 1st, 2nd, and 3rd place.
             for (uint256 i = 0; i < _comps[_compIds].winners.length; i++) {
                 compBalance /= 2;
-                address payable payoutAddress = payable(_comps[_compIds].winners[i]);
+                address payable payoutAddress = payable(
+                    _comps[_compIds].winners[i]
+                );
                 payoutAddress.transfer(compBalance);
+
+                // Adds 1 to amtOfLeaderPlacements[i] which means they came in 1st, 2nd or, 3rd.
+                _users[_comps[_compIds].winners[i]].amtOfLeaderPlacements[
+                    i
+                ] += 1;
             }
 
+            // Gather up all gained votes for each competitor.
+            addUpVotes();
             //Increasing ID for next competition.
             _compIds += 1;
+            // Resets _leaderCount.
+            _leaderCount = 0;
         }
     }
 
@@ -194,15 +217,15 @@ contract Competition is ERC721URIStorage, Ownable {
             msg.sender != voteFor,
             "Not allowed to vote for yourself to win."
         );
-        _users[msg.sender].allotedVotes -= 1;
-        _users[voteFor].gainedVotes += 1;
+        _users[msg.sender].allotedVotesPerComp -= 1;
+        _users[voteFor].gainedVotesPerComp += 1;
     }
 
     // Returns all stats.
     // Competition Id (uint), All users in competition array (address[]), Type of competition (string),
     // Total spots in competiion (uint), and Cost to join the competition (uint).
     // spots, cost , and type set by owner for now.
-    function getCompetitionStats()
+    function getCompetitionStats(uint256 selectedComp)
         public
         view
         returns (
@@ -216,13 +239,13 @@ contract Competition is ERC721URIStorage, Ownable {
         )
     {
         return (
-            _comps[_compIds].compId,
-            _comps[_compIds].usersInComp,
-            _comps[_compIds].typeOfComp,
-            _comps[_compIds].totalSpotsInComp,
-            _comps[_compIds].costToJoin,
-            _comps[_compIds].isCompStarted,
-            _comps[_compIds].winners
+            _comps[selectedComp].compId,
+            _comps[selectedComp].usersInComp,
+            _comps[selectedComp].typeOfComp,
+            _comps[selectedComp].totalSpotsInComp,
+            _comps[selectedComp].costToJoin,
+            _comps[selectedComp].isCompStarted,
+            _comps[selectedComp].winners
         );
     }
 

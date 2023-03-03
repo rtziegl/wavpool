@@ -14,7 +14,7 @@ const main = async () => {
 
     console.log("Contract deployed by:", owner.address);
     await compContract.startCompetition(51, hre.ethers.utils.parseEther('0.01') , "Beat");
-    console.log(await compContract.getCompetitionStats())
+    console.log(await compContract.getCompetitionStats(0))
     var buyTXoptions = { value: hre.ethers.utils.parseEther('0.01') }
 
     // RandomPerson's buyin.
@@ -27,14 +27,9 @@ const main = async () => {
     await compContract.connect(randomPerson1).vote(randomPerson.address)
     await compContract.connect(randomPerson2).vote(randomPerson1.address)
 
-    console.log(await compContract.getCompetitionStats())
+    console.log(await compContract.getCompetitionStats(0))
     await await compContract.endCompetition()
-
-    await compContract.startCompetition(51, hre.ethers.utils.parseEther('0.01') , "Beat");
-    await compContract.connect(randomPerson).buyin(buyTXoptions)
-    await compContract.connect(randomPerson1).buyin(buyTXoptions)
-    await compContract.connect(randomPerson2).buyin(buyTXoptions)
-    console.log(await compContract.getCompetitionStats())
+    console.log(await compContract.getCompetitionStats(0))
 
     
   };
