@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract Competition is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+
     mapping(address => Competitor) private _users;
     mapping(uint256 => Comp) private _comps;
     uint256 private _compIds;
@@ -90,7 +91,18 @@ contract Competition is ERC721URIStorage, Ownable {
             msg.value == _comps[_compIds].costToJoin,
             "Incorrect payment amount."
         );
-        _users[msg.sender] = Competitor(msg.sender, 0, 1, 0);
+
+        // If competitor doesn't exist make a new competitor.
+        if (_users[msg.sender].user != msg.sender){
+            _users[msg.sender] = Competitor(msg.sender, 0, 1, 0);
+            console.log("new");
+        }
+        // If competitior does already exist reset their alloted votes and gained votes.
+        else{
+            _users[msg.sender].allotedVotes = 1;
+            _users[msg.sender].gainedVotes = 0;
+        }
+
         _comps[_compIds].usersInComp.push(msg.sender);
         _comps[_compIds].totalSpotsInComp -= 1;
     }
@@ -199,7 +211,8 @@ contract Competition is ERC721URIStorage, Ownable {
             string memory,
             uint256,
             uint256,
-            bool
+            bool,
+            address[] memory
         )
     {
         return (
