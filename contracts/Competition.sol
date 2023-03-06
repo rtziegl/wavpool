@@ -249,6 +249,24 @@ contract Competition is ERC721URIStorage, Ownable {
         );
     }
 
+    //Returns competitor stats.
+    function getCompetitorStats(address competitor) 
+    public 
+    view 
+    returns(
+        address,
+        int256,
+        int256,
+        uint256[] memory
+    ){
+        return(
+            _users[competitor].user,
+            _users[competitor].gainedVotesPerComp,
+            _users[competitor].gainedVotesAllTime,
+            _users[competitor].amtOfLeaderPlacements
+        );
+    }
+
     // Returns current balance of contract.
     function getBalanceOfContract() public view onlyOwner returns (uint256) {
         return address(this).balance;
