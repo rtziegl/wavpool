@@ -250,20 +250,20 @@ contract Competition is ERC721URIStorage, Ownable {
     }
 
     //Returns competitor stats.
-    function getCompetitorStats(address competitor) 
+    function getCompetitorStats() 
     public 
     view 
     returns(
         address,
         int256,
         int256,
-        uint256[] memory
+        uint256[3] memory
     ){
         return(
-            _users[competitor].user,
-            _users[competitor].gainedVotesPerComp,
-            _users[competitor].gainedVotesAllTime,
-            _users[competitor].amtOfLeaderPlacements
+            _users[msg.sender].user,
+            _users[msg.sender].gainedVotesPerComp,
+            _users[msg.sender].gainedVotesAllTime,
+            _users[msg.sender].amtOfLeaderPlacements
         );
     }
 
