@@ -13,7 +13,7 @@ Steps Completed for Testnet:
 ```
 TODOS:
 
-1. Re-deploy updated contract to testnet.
+1. Re-deploy updated contract to testnet. (Complete)
 2. Create admin page to start / end competitions.
 3. Create a new Competition ui on the homescreen that pulls from contract appropriately and updates winners from previous competition.
 

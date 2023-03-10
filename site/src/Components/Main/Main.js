@@ -7,7 +7,7 @@ const { ethers } = require("ethers");
 
 export default function Main() {
     const [remainingSpots, updateRemaining] = useState("Competition hasn't started.");
-    const contractAddress = "0xfcA9C127Dc84B8a950e75de7d778B2A381e23BC6";
+    const contractAddress = "0x41D1b883062E5E09a142b1faB7B3fB42807484B1";
     const contractABI = abi.abi;
 
     //Gets competition stats from Competition.sol.
