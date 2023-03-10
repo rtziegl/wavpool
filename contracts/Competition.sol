@@ -23,11 +23,13 @@ contract Competition is ERC721URIStorage, Ownable {
 
     struct Competitor {
         address user;
-        uint256 nftCount;
+        uint256 nftCountPerComp;
+        uint256 nftCountAllTime;
         uint256 allotedVotesPerComp;
         int256 gainedVotesPerComp;
         int256 gainedVotesAllTime;
         uint256[3] amtOfLeaderPlacements;
+        uint256 amtOfCompsEntered;
     }
 
     struct Comp {
@@ -56,7 +58,7 @@ contract Competition is ERC721URIStorage, Ownable {
     // Ensures user has not already minted during the competition.
     modifier hasNotMinted() {
         require(
-            _users[msg.sender].nftCount < 1,
+            _users[msg.sender].nftCountPerComp < 1,
             "User has already minted.  Only one mint per user allowed per competition."
         );
         _;
@@ -106,18 +108,20 @@ contract Competition is ERC721URIStorage, Ownable {
         uint256[3] memory dummyArray;
         // If competitor doesn't exist make a new competitor.
         if (_users[msg.sender].user != msg.sender) {
-            _users[msg.sender] = Competitor(msg.sender, 0, 1, 0, 0, dummyArray);
+            _users[msg.sender] = Competitor(msg.sender, 0, 0, 1, 0, 0, dummyArray, 0);
             console.log("new");
         }
         // If competitior does already exist reset their alloted votes, gained votes and nft count.
         else {
             _users[msg.sender].allotedVotesPerComp = 1;
             _users[msg.sender].gainedVotesPerComp = 0;
-            _users[msg.sender].nftCount = 0;
+            _users[msg.sender].nftCountPerComp = 0;
         }
 
         _comps[_compIds].usersInComp.push(msg.sender);
         _comps[_compIds].totalSpotsInComp -= 1;
+
+        _users[msg.sender].amtOfCompsEntered += 1;
     }
 
     // Mints an NFT as long as isInComp is true.
@@ -131,7 +135,8 @@ contract Competition is ERC721URIStorage, Ownable {
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
-        _users[msg.sender].nftCount += 1;
+        _users[msg.sender].nftCountPerComp += 1;
+        _users[msg.sender].nftCountAllTime += 1;
         return newItemId;
     }
 
@@ -225,7 +230,7 @@ contract Competition is ERC721URIStorage, Ownable {
     // Competition Id (uint), All users in competition array (address[]), Type of competition (string),
     // Total spots in competiion (uint), and Cost to join the competition (uint).
     // spots, cost , and type set by owner for now.
-    function getCompetitionStats(uint256 selectedComp)
+    function getCompetitionStats()
         public
         view
         returns (
@@ -234,19 +239,23 @@ contract Competition is ERC721URIStorage, Ownable {
             string memory,
             uint256,
             uint256,
-            bool,
-            address[] memory
+            bool
         )
     {
         return (
-            _comps[selectedComp].compId,
-            _comps[selectedComp].usersInComp,
-            _comps[selectedComp].typeOfComp,
-            _comps[selectedComp].totalSpotsInComp,
-            _comps[selectedComp].costToJoin,
-            _comps[selectedComp].isCompStarted,
-            _comps[selectedComp].winners
+            _comps[_compIds].compId,
+            _comps[_compIds].usersInComp,
+            _comps[_compIds].typeOfComp,
+            _comps[_compIds].totalSpotsInComp,
+            _comps[_compIds].costToJoin,
+            _comps[_compIds].isCompStarted
         );
+    }
+
+    //Returns the winner after the first competition ends and every competition after that ends.
+    function getWinners() public view returns(address [] memory){
+        require(_compIds >= 1, "The first competition hasn't ended.");
+        return _comps[_compIds - 1].winners;
     }
 
     //Returns competitor stats.
@@ -257,13 +266,17 @@ contract Competition is ERC721URIStorage, Ownable {
         address,
         int256,
         int256,
-        uint256[3] memory
+        uint256[3] memory,
+        uint256,
+        uint256
     ){
         return(
             _users[msg.sender].user,
             _users[msg.sender].gainedVotesPerComp,
             _users[msg.sender].gainedVotesAllTime,
-            _users[msg.sender].amtOfLeaderPlacements
+            _users[msg.sender].amtOfLeaderPlacements,
+            _users[msg.sender].amtOfCompsEntered,
+            _users[msg.sender].nftCountAllTime
         );
     }
 
