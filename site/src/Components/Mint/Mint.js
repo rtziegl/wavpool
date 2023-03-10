@@ -1,6 +1,6 @@
 import Dropzone from "./Dropzone";
 import React, { useCallback, useState } from "react";
-import "./thepool.css";
+import "./mint.css";
 
 export default function ThePool(){
     return(

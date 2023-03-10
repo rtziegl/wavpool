@@ -68,7 +68,9 @@ export default function Navbar() {
       <div className="logo"><Link to='/'>wavpool</Link></div>
       <nav>
         <ul className="nav_links">
-          <CustomLink to='/thepool'>the pool</CustomLink>
+          <CustomLink to='/marketplace'>nft store</CustomLink>
+          <CustomLink to='/mint'>mint</CustomLink>
+          <CustomLink to='/vote'>vote</CustomLink>
           <CustomLink to='/discord'>discord</CustomLink>
           <CustomLink to='/about'>about</CustomLink>
         </ul>

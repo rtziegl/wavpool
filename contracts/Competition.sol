@@ -258,8 +258,8 @@ contract Competition is ERC721URIStorage, Ownable {
         return _comps[_compIds - 1].winners;
     }
 
-    //Returns competitor stats.
-    function getCompetitorStats() 
+    //Used to return competitor stats for each competitor.
+    function getCompetitorStats(address competitors) 
     public 
     view 
     returns(
@@ -271,12 +271,12 @@ contract Competition is ERC721URIStorage, Ownable {
         uint256
     ){
         return(
-            _users[msg.sender].user,
-            _users[msg.sender].gainedVotesPerComp,
-            _users[msg.sender].gainedVotesAllTime,
-            _users[msg.sender].amtOfLeaderPlacements,
-            _users[msg.sender].amtOfCompsEntered,
-            _users[msg.sender].nftCountAllTime
+            _users[competitors].user,
+            _users[competitors].gainedVotesPerComp,
+            _users[competitors].gainedVotesAllTime,
+            _users[competitors].amtOfLeaderPlacements,
+            _users[competitors].amtOfCompsEntered,
+            _users[competitors].nftCountAllTime
         );
     }
 
