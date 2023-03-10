@@ -1,0 +1,13 @@
+.admin{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding-left: 40%;
+    padding-right: 40%;
+    padding-top: 3%;
+}
+
+button{
+    margin-bottom: 15%;
+    padding-bottom: 5%;
+}

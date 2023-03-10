@@ -19,10 +19,8 @@ export default function Main() {
                 const provider = new ethers.providers.Web3Provider(ethereum);
                 const signer = provider.getSigner();
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
-                
-                console.log(signer)
+    
                 let compinfo = await compContract.getCompetitionStats()
-                console.log(compinfo)
                 if (compinfo[1].length == 0) {
                     updateRemaining("Competition hasn't started yet.")
                 }
