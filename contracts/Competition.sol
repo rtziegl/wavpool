@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract Competition is ERC721URIStorage, Ownable {
+contract Competition is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -20,6 +19,8 @@ contract Competition is ERC721URIStorage, Ownable {
 
     address private constant _DELETEDUSER =
         0x0000000000000000000000000000000000000000;
+
+    address private owner;
 
     struct Competitor {
         address user;
@@ -44,6 +45,13 @@ contract Competition is ERC721URIStorage, Ownable {
 
     constructor() ERC721("wavpool NFT", "WAVP") {
         _comps[_compIds].isCompStarted = false;
+        owner = msg.sender;
+    }
+
+    // Allows me to ensure ownership.
+    modifier onlyOwner(){
+        require(msg.sender == owner, "Not owner, not allowed.");
+        _;
     }
 
     // Ensures user is in competition before being able to mint an nft.
@@ -71,6 +79,14 @@ contract Competition is ERC721URIStorage, Ownable {
             "User has already voted.  Can only vote once per competition."
         );
         _;
+    }
+
+    // Allows an ownership check to be returned.
+    function checkIfOwner() public view returns(bool){
+        if (owner == msg.sender)
+            return true;
+        else
+            return false;
     }
 
     // Checks if user is in the competition.
@@ -290,4 +306,5 @@ contract Competition is ERC721URIStorage, Ownable {
         address payable to = payable(msg.sender);
         to.transfer(getBalanceOfContract());
     }
+
 }

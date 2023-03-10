@@ -8,6 +8,9 @@ const main = async () => {
     const compContract = await compFactory.deploy();
     await compContract.deployed();
 
+    console.log(await compContract.connect(randomPerson).checkIfOwner())
+    console.log(await compContract.checkIfOwner())
+
     /*const mintFactory = await hre.ethers.getContractFactory("Minter");
     const mintContract = await mintFactory.deploy();
     await mintContract.deployed();*/
@@ -30,7 +33,6 @@ const main = async () => {
     console.log(await compContract.getCompetitionStats(0))
     await await compContract.endCompetition()
     console.log(await compContract.getCompetitionStats(0))
-
     
   };
   
