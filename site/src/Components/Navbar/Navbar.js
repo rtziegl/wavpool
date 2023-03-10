@@ -71,6 +71,7 @@ export default function Navbar() {
           <CustomLink to='/marketplace'>nft store</CustomLink>
           <CustomLink to='/mint'>mint</CustomLink>
           <CustomLink to='/vote'>vote</CustomLink>
+          <CustomLink to='/leaderboard'>leaderboard</CustomLink>
           <CustomLink to='/discord'>discord</CustomLink>
           <CustomLink to='/about'>about</CustomLink>
         </ul>
