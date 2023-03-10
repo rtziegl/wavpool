@@ -7,7 +7,7 @@ import Discord from "./Components/Discord/Discord.js"
 import Marketplace from "./Components/Marketplace/Marketplace.js";
 import Vote from "./Components/Vote/Vote.js";
 import Leaderboard from "./Components/Leaderboard/Leaderboard.js";
-
+import Admin from "./Components/Admin/Admin.js";
 import { Route, Routes } from "react-router-dom"
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
       <Underline />
       <Routes>
         <Route path='/' element={<Main />} />
+        <Route path='/admin' element={<Admin />} />
         <Route path='/marketplace' element={<Marketplace />} />
         <Route path='/mint' element={<Mint />} />
         <Route path='/vote' element={<Vote />} />
