@@ -3,24 +3,35 @@ pragma solidity ^0.8.17;
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 contract Competition is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+    // Comp, Competitor, Admin mappings.
     mapping(address => Competitor) private _users;
+    mapping(address => Admin) private _admins;
     mapping(uint256 => Comp) private _comps;
     uint256 private _compIds;
 
+    // Voting and Leader States.
     address private _voteLeader;
     int256 private _amtOfVotesForLeader;
     uint256 private _leaderIndex;
     uint256 private _leaderCount;
 
+    // No user Address.
     address private constant _DELETEDUSER =
         0x0000000000000000000000000000000000000000;
 
+    // Owner address.
     address private owner;
+
+    // Events.
+    event Start(uint256, uint256, string, string);
+    event Payout(address, uint256, uint256);
+    event End(address[], string);
 
     struct Competitor {
         address user;
@@ -43,13 +54,27 @@ contract Competition is ERC721URIStorage {
         string typeOfComp;
     }
 
+    struct Admin {
+        address adminAddress;
+    }
+
     constructor() ERC721("wavpool NFT", "WAVP") {
         _comps[_compIds].isCompStarted = false;
         owner = msg.sender;
     }
 
+    // Ensuring admin or Owner is using a function.
+    modifier onlyAdmins() {
+        require(
+            msg.sender == _admins[msg.sender].adminAddress ||
+                msg.sender == owner,
+            "Not Admin or Owner. Therefore, not allowed."
+        );
+        _;
+    }
+
     // Allows me to ensure ownership.
-    modifier onlyOwner(){
+    modifier onlyOwner() {
         require(msg.sender == owner, "Not owner, not allowed.");
         _;
     }
@@ -82,11 +107,9 @@ contract Competition is ERC721URIStorage {
     }
 
     // Allows an ownership check to be returned.
-    function checkIfOwner() public view returns(bool){
-        if (owner == msg.sender)
-            return true;
-        else
-            return false;
+    function checkIfOwner() public view returns (bool) {
+        if (owner == msg.sender) return true;
+        else return false;
     }
 
     // Checks if user is in the competition.
@@ -124,7 +147,16 @@ contract Competition is ERC721URIStorage {
         uint256[3] memory dummyArray;
         // If competitor doesn't exist make a new competitor.
         if (_users[msg.sender].user != msg.sender) {
-            _users[msg.sender] = Competitor(msg.sender, 0, 0, 1, 0, 0, dummyArray, 0);
+            _users[msg.sender] = Competitor(
+                msg.sender,
+                0,
+                0,
+                1,
+                0,
+                0,
+                dummyArray,
+                0
+            );
             console.log("new");
         }
         // If competitior does already exist reset their alloted votes, gained votes and nft count.
@@ -141,12 +173,9 @@ contract Competition is ERC721URIStorage {
     }
 
     // Mints an NFT as long as isInComp is true.
-    function mintNFT(string memory tokenURI)
-        public
-        isInComp
-        hasNotMinted
-        returns (uint256)
-    {
+    function mintNFT(
+        string memory tokenURI
+    ) public isInComp hasNotMinted returns (uint256) {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
@@ -161,7 +190,7 @@ contract Competition is ERC721URIStorage {
         uint256 spots,
         uint256 cost,
         string memory typeComp
-    ) public onlyOwner {
+    ) public onlyAdmins {
         address[] memory dummyArray;
         _comps[_compIds] = Comp(
             dummyArray,
@@ -172,10 +201,22 @@ contract Competition is ERC721URIStorage {
             true,
             typeComp
         );
+
+        // Emit start event.
+        emit Start(
+            spots,
+            cost,
+            typeComp,
+            string.concat(
+                "Competition ",
+                Strings.toString(_compIds),
+                "has started."
+            )
+        );
     }
 
     // Ends a competition and finds winners.
-    function endCompetition() public onlyOwner {
+    function endCompetition() public onlyAdmins {
         // Only three winners allowed.
         if (_leaderCount <= 2) {
             // Finds leader.
@@ -219,6 +260,13 @@ contract Competition is ERC721URIStorage {
                 _users[_comps[_compIds].winners[i]].amtOfLeaderPlacements[
                     i
                 ] += 1;
+
+                //Emit Payout event which is the winners address, the amount payed and the place the user came in.
+                emit Payout(
+                    _users[_comps[_compIds].winners[i]].user,
+                    compBalance,
+                    i
+                );
             }
 
             // Gather up all gained votes for each competitor.
@@ -227,6 +275,8 @@ contract Competition is ERC721URIStorage {
             _compIds += 1;
             // Resets _leaderCount.
             _leaderCount = 0;
+            // Emit end event which is the array of winners.
+            emit End(_comps[_compIds].winners, "Competition Ended.");
         }
     }
 
@@ -269,24 +319,20 @@ contract Competition is ERC721URIStorage {
     }
 
     //Returns the winner after the first competition ends and every competition after that ends.
-    function getWinners() public view returns(address [] memory){
+    function getWinners() public view returns (address[] memory) {
         require(_compIds >= 1, "The first competition hasn't ended.");
         return _comps[_compIds - 1].winners;
     }
 
     //Used to return competitor stats for each competitor.
-    function getCompetitorStats(address competitors) 
-    public 
-    view 
-    returns(
-        address,
-        int256,
-        int256,
-        uint256[3] memory,
-        uint256,
-        uint256
-    ){
-        return(
+    function getCompetitorStats(
+        address competitors
+    )
+        public
+        view
+        returns (address, int256, int256, uint256[3] memory, uint256, uint256)
+    {
+        return (
             _users[competitors].user,
             _users[competitors].gainedVotesPerComp,
             _users[competitors].gainedVotesAllTime,
@@ -294,6 +340,16 @@ contract Competition is ERC721URIStorage {
             _users[competitors].amtOfCompsEntered,
             _users[competitors].nftCountAllTime
         );
+    }
+
+    // Adds an admin.
+    function addAdmin(address admin) public onlyOwner {
+        _admins[admin] = Admin(admin);
+    }
+
+    // Deletes an admin.
+    function delAdmin(address admin) public onlyOwner {
+        delete _admins[admin];
     }
 
     // Returns current balance of contract.
@@ -306,5 +362,4 @@ contract Competition is ERC721URIStorage {
         address payable to = payable(msg.sender);
         to.transfer(getBalanceOfContract());
     }
-
 }
