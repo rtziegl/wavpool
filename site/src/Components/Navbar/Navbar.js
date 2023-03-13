@@ -39,7 +39,7 @@ export default function Navbar() {
         setCurrentAccount(account);
         toggleConnect(true)
 
-        if (await compContract.checkIfOwner() == true){
+        if (await compContract.checkIfOwner() == true || await compContract.checkIfAdmin()){
           console.log("OWNER")
           setOwner(true)
         }

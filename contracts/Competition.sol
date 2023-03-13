@@ -112,6 +112,12 @@ contract Competition is ERC721URIStorage {
         else return false;
     }
 
+    // Allows an admin check to be returned.
+    function checkIfAdmin() public view returns (bool) {
+        if (msg.sender == _admins[msg.sender].adminAddress) return true;
+        else return false;
+    }
+
     // Checks if user is in the competition.
     function checkIfUserInCompetition() private view returns (bool) {
         for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
