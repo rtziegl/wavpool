@@ -138,7 +138,9 @@ contract Competition is ERC721URIStorage {
                 .gainedVotesPerComp;
             // Ensures no duplicate user address entries.
             if (_users[_comps[_compIds].usersInComp[i]].amtOfCompsEntered == 1)
-                _allCompetitors.push(_users[_comps[_compIds].usersInComp[i]].user);
+                _allCompetitors.push(
+                    _users[_comps[_compIds].usersInComp[i]].user
+                );
         }
     }
 
@@ -304,6 +306,11 @@ contract Competition is ERC721URIStorage {
         _users[voteFor].gainedVotesPerComp += 1;
     }
 
+    // Returns all competitors that have ever bought in.
+    function getAllUsers() public view returns (address[] memory) {
+        return _allCompetitors;
+    }
+
     // Returns all stats.
     // Competition Id (uint), All users in competition array (address[]), Type of competition (string),
     // Total spots in competiion (uint), and Cost to join the competition (uint).
@@ -342,11 +349,10 @@ contract Competition is ERC721URIStorage {
     )
         public
         view
-        returns (address, int256, int256, uint256[3] memory, uint256, uint256)
+        returns (address, int256, uint256[3] memory, uint256, uint256)
     {
         return (
             _users[competitors].user,
-            _users[competitors].gainedVotesPerComp,
             _users[competitors].gainedVotesAllTime,
             _users[competitors].amtOfLeaderPlacements,
             _users[competitors].amtOfCompsEntered,
