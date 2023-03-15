@@ -1,13 +1,16 @@
 .admin{
     display: flex;
     justify-content: center;
-    flex-direction: column;
-    padding-left: 40%;
-    padding-right: 40%;
+    flex-direction: row;
+    padding-left: 30%;
+    padding-right: 30%;
     padding-top: 3%;
 }
 
 button{
     margin-bottom: 15%;
-    padding-bottom: 5%;
+    margin-left: 20px;
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-bottom: 2%;
 }
