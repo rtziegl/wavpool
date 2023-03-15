@@ -131,17 +131,11 @@ contract Competition is ERC721URIStorage {
     }
 
     // Adds up total votes for each competitor for each competition.
-    // Adds each user address to _allCompetitors.
-    function tallyVotesAndCollectUsers() private {
+    function tallyVotes() private {
         for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
             _users[_comps[_compIds].usersInComp[i]]
                 .gainedVotesAllTime += _users[_comps[_compIds].usersInComp[i]]
                 .gainedVotesPerComp;
-            // Ensures no duplicate user address entries.
-            if (_users[_comps[_compIds].usersInComp[i]].amtOfCompsEntered == 1)
-                _allCompetitors.push(
-                    _users[_comps[_compIds].usersInComp[i]].user
-                );
         }
     }
 
@@ -173,6 +167,8 @@ contract Competition is ERC721URIStorage {
                 dummyArray,
                 0
             );
+
+            _allCompetitors.push(msg.sender);
         }
         // If competitior does already exist reset their alloted votes, gained votes and nft count.
         else {
@@ -286,8 +282,8 @@ contract Competition is ERC721URIStorage {
                 );
             }
 
-            // Gather up all gained votes for each competitor and collect addresses.
-            tallyVotesAndCollectUsers();
+            // Gather up all gained votes for each competitor.
+            tallyVotes();
             //Increasing ID for next competition.
             _compIds += 1;
             // Resets _leaderCount.
