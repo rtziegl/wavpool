@@ -33,6 +33,7 @@ contract Competition is ERC721URIStorage {
 
     // Events.
     event Start(uint256, uint256, string, string);
+    event Buyin(address);
     event Payout(address, uint256, uint256);
     event End(address[], string);
 
@@ -184,6 +185,8 @@ contract Competition is ERC721URIStorage {
         _comps[_compIds].totalSpotsInComp -= 1;
 
         _users[msg.sender].amtOfCompsEntered += 1;
+
+        emit Buyin(msg.sender);
     }
 
     // Mints an NFT as long as isInComp is true.
