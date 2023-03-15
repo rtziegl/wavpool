@@ -51,6 +51,15 @@ h3 {
   flex-direction: column;
 }
 
+.left-box-no-comp {
+  display: flex;
+  align-content: flex-start;
+  background-color: rgb(251, 251, 251);
+  justify-content: center;
+  padding-top: 30%;
+  flex-direction: column;
+}
+
 .main-li {
   display: flex;
   flex-direction: column;

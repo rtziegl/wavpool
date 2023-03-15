@@ -54,6 +54,7 @@ export default function Navbar() {
       return false;
     } catch (error) {
       console.log(error);
+      console.log("error");
     }
   }
 
