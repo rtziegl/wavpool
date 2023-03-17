@@ -6,7 +6,6 @@ import abi from "../../contract_utils/Competition.json";
 const { ethers } = require("ethers");
 
 export default function Main() {
-    const [remainingSpots, updateRemaining] = useState("Competition hasn't started.");
     const [compTitle, setCompTitle] = useState("");
     const [compType, setCompType] = useState("");
     const [compSpots, setCompSpots] = useState("");
@@ -34,16 +33,15 @@ export default function Main() {
                 const signer = provider.getSigner();
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
     
-                let compinfo = await compContract.getCompetitionStats()
-                console.log(compinfo)
-                if (compinfo[5] == false) {
-                    updateRemaining("Competition hasn't started.")
+                let compInfo = await compContract.getCompetitionStats()
+                console.log(compInfo)
+                if (compInfo[5] == true) {
+                    setCompStarted(true)
+                    setCompTitle(compInfo[0])
+                    setCompType(compInfo[2])
+                    setCompSpots(parseInt(compInfo[3]._hex, 16))
+                    setCompCost(parseInt(compInfo[4]._hex, 16))
                 }
-                else {
-                    updateRemaining(parseInt(compinfo[3]._hex, 16))
-                }
-
-
             }
         } catch (error) {
             console.log(error)
@@ -77,12 +75,14 @@ export default function Main() {
                     <div className='vl'></div>
                     <div className="child2">
                         {compStarted && (<div className='left-box'>
+                            <li className='main-li'>{compTitle}</li>
+                            <li className='main-li'>{compType}</li>
+                            <li className='main-li'>{compCost}</li>
+                            <li className='main-li'>{compSpots}</li>
                             <div className='box-header'>Buyin</div>
                             <div className='button-size'>
                                 <button className="button-592" role="button" onClick={() => "connectWallet()"}>Buyin to the competition.</button>
                             </div>
-                            <div className='box-header2'>Spots Remaining</div>
-                            <li className='main-li'>{remainingSpots}</li>
                         </div>)}
                         {!compStarted &&  (<div className='left-box-no-comp'><div className='box-header'>No competition currently</div> </div>)}
                     </div>
