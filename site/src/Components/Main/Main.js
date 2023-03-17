@@ -3,6 +3,7 @@ import './main-button.css'
 import './main-header.css'
 import React, { useEffect, useState } from "react";
 import abi from "../../contract_utils/Competition.json";
+var Web3 = require('web3');
 const { ethers } = require("ethers");
 
 export default function Main() {
@@ -35,9 +36,10 @@ export default function Main() {
     
                 let compInfo = await compContract.getCompetitionStats()
                 console.log(compInfo)
+                console.log(compStarted)
                 if (compInfo[5] == true) {
                     setCompStarted(true)
-                    setCompTitle(compInfo[0])
+                    setCompTitle(parseInt(compInfo[0]._hex, 16))
                     setCompType(compInfo[2])
                     setCompSpots(parseInt(compInfo[3]._hex, 16))
                     setCompCost(parseInt(compInfo[4]._hex, 16))
