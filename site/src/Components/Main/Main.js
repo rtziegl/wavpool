@@ -3,7 +3,7 @@ import './main-button.css'
 import './main-header.css'
 import React, { useEffect, useState } from "react";
 import abi from "../../contract_utils/Competition.json";
-var Web3 = require('web3');
+const web3 = require('web3');
 const { ethers } = require("ethers");
 
 export default function Main() {
@@ -35,14 +35,15 @@ export default function Main() {
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
     
                 let compInfo = await compContract.getCompetitionStats()
+                // Conversion from wei to actual amount of eth.
+                let costInEth = web3.utils.fromWei(web3.utils.hexToNumberString(compInfo[4]._hex, 'ether'))
                 console.log(compInfo)
-                console.log(compStarted)
                 if (compInfo[5] == true) {
                     setCompStarted(true)
                     setCompTitle(parseInt(compInfo[0]._hex, 16))
                     setCompType(compInfo[2])
                     setCompSpots(parseInt(compInfo[3]._hex, 16))
-                    setCompCost(parseInt(compInfo[4]._hex, 16))
+                    setCompCost(costInEth)
                 }
             }
         } catch (error) {
@@ -77,11 +78,10 @@ export default function Main() {
                     <div className='vl'></div>
                     <div className="child2">
                         {compStarted && (<div className='left-box'>
-                            <li className='main-li'>{compTitle}</li>
-                            <li className='main-li'>{compType}</li>
-                            <li className='main-li'>{compCost}</li>
-                            <li className='main-li'>{compSpots}</li>
-                            <div className='box-header'>Buyin</div>
+                            <li className='main-li'>Competition #{compTitle}</li>
+                            <li className='main-li'>Type: {compType}</li>
+                            <li className='main-li'>Cost to join: {compCost} ETH</li>
+                            <li className='main-li'>Spots remaining: {compSpots}</li>
                             <div className='button-size'>
                                 <button className="button-592" role="button" onClick={() => "connectWallet()"}>Buyin to the competition.</button>
                             </div>
