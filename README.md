@@ -12,15 +12,10 @@ Steps Completed for Testnet:
 
 ```
 TODOS:
-1. Create a new Competition ui on the homescreen that pulls from contract appropriately and updates winners from previous competition. (Functionality almost complete.)
-Conversion from wei.
+1. Vote Page.
+2. Leaderboard page.
+3. Discord page almost done (Brendan)
+4. About page.
 
 How to store a and retrieve a sample on competition buyin.  Whats the best way? Private dropbox, Mediafire, google drive? IPFS to keep it web3? Upload on discord?
-Update homepage to take in how many people are in the current competition. Add price of buyin maybe.
-Calls to contract to join comp and Mint NFT needs to be set up.
-Admin page to create competitions and end them.
-Leaderboard page.
-Vote Page.
-Discord page.
-About page.
 ```
