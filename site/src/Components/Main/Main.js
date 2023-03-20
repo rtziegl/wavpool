@@ -51,6 +51,22 @@ export default function Main() {
         }
     }
 
+    const buyinToComp =  async () =>{
+        try {
+            const { ethereum } = window;
+
+            if (ethereum) {
+                const provider = new ethers.providers.Web3Provider(ethereum);
+                const signer = provider.getSigner();
+                const compContract = new ethers.Contract(contractAddress, contractABI, signer);
+                var buyTXoptions = { value: ethers.utils.parseEther(compCost) }
+                await compContract.buyin(buyTXoptions)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         getCompStats()
     }, [])
@@ -83,7 +99,7 @@ export default function Main() {
                             <li className='main-li'>Cost to join: {compCost} ETH</li>
                             <li className='main-li'>Spots remaining: {compSpots}</li>
                             <div className='button-size'>
-                                <button className="button-592" role="button" onClick={() => "connectWallet()"}>Buyin to the competition.</button>
+                                <button className="button-592" role="button" onClick={buyinToComp}>Buyin to the competition.</button>
                             </div>
                         </div>)}
                         {!compStarted &&  (<div className='left-box-no-comp'><div className='box-header'>No competition currently</div> </div>)}
