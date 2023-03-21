@@ -13,7 +13,7 @@ Steps Completed for Testnet:
 ```
 TODOS:
 1. Vote Page.
-2. Leaderboard page.
+2. Leaderboard page. (Create rules for leaderboard, i.e. comparing competitors and create default page for when theres no leaderboard (before first comp starts.))
 3. Discord page almost done (Brendan)
 4. About page.
 
