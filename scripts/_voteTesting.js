@@ -15,6 +15,7 @@ const main = async () => {
     const mintContract = await mintFactory.deploy();
     await mintContract.deployed();*/
 
+    
     console.log("Contract deployed by:", owner.address);
     await compContract.startCompetition(51, hre.ethers.utils.parseEther('0.01') , "Beat");
     console.log(await compContract.getCompetitionStats())

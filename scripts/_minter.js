@@ -12,11 +12,10 @@ const main = async () => {
     await mintContract.deployed();*/
 
     console.log("Contract deployed by:", owner.address);
-
     var buyTXoptions = { value: hre.ethers.utils.parseEther('0.01') }
+    var btx = hre.ethers.utils.parseEther('0.01') 
+    await compContract.startCompetition(50, btx, "Beat")
     await compContract.buyin(buyTXoptions)
-    console.log(await compContract.getAllFromCompetition())
-    console.log(await compContract.getSpotsRemaining())
 
     // Minting the token
     const transaction= await compContract.mintNFT(

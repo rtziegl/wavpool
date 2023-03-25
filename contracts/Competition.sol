@@ -51,10 +51,12 @@ contract Competition is ERC721URIStorage {
     struct Comp {
         address[] usersInComp;
         address[] winners;
+        string[] uris;
         uint256 costToJoin;
         uint256 totalSpotsInComp;
         uint256 compId;
         bool isCompStarted;
+        bool hasCompEnded;
         string typeOfComp;
     }
 
@@ -195,6 +197,7 @@ contract Competition is ERC721URIStorage {
         _setTokenURI(newItemId, tokenURI);
         _users[msg.sender].nftCountPerComp += 1;
         _users[msg.sender].nftCountAllTime += 1;
+        _comps[_compIds].uris.push(tokenURI);
         return newItemId;
     }
 
@@ -204,14 +207,17 @@ contract Competition is ERC721URIStorage {
         uint256 cost,
         string memory typeComp
     ) public onlyAdmins {
-        address[] memory dummyArray;
+        address[] memory emptyAddress;
+        string[] memory emptyString;
         _comps[_compIds] = Comp(
-            dummyArray,
-            dummyArray,
+            emptyAddress,
+            emptyAddress,
+            emptyString,
             cost,
             spots,
             _compIds,
             true,
+            false,
             typeComp
         );
 
@@ -223,7 +229,7 @@ contract Competition is ERC721URIStorage {
             string.concat(
                 "Competition ",
                 Strings.toString(_compIds),
-                "has started."
+                " has started."
             )
         );
     }
@@ -288,9 +294,16 @@ contract Competition is ERC721URIStorage {
             _compIds += 1;
             // Resets _leaderCount.
             _leaderCount = 0;
+            // Sets hasCompEnded to true;
+            _comps[_compIds].hasCompEnded = true;
             // Emit end event which is the array of winners.
             emit End(_comps[_compIds].winners, "Competition Ended.");
         }
+    }
+
+    // ALlows admins to cancel the competition by deleting the comp.
+    function cancelCompetition() public onlyAdmins{
+        delete _comps[_compIds];
     }
 
     // Allows users in competition to vote for a winning beat.
@@ -320,19 +333,23 @@ contract Competition is ERC721URIStorage {
         returns (
             uint256,
             address[] memory,
+            string[] memory,
             string memory,
             uint256,
             uint256,
+            bool,
             bool
         )
     {
         return (
             _comps[_compIds].compId,
             _comps[_compIds].usersInComp,
+            _comps[_compIds].uris,
             _comps[_compIds].typeOfComp,
             _comps[_compIds].totalSpotsInComp,
             _comps[_compIds].costToJoin,
-            _comps[_compIds].isCompStarted
+            _comps[_compIds].isCompStarted,
+            _comps[_compIds].hasCompEnded
         );
     }
 

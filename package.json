@@ -2,13 +2,14 @@
   "name": "hardhat-project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
-    "hardhat": "^2.12.4"
+    "hardhat": "^2.12.4",
+    "js-ipfs-fetch": "^4.2.3"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.0",
     "bn.js": "^5.2.1",
     "dotenv": "^16.0.3",
-    "js-ipfs-fetch": "^4.2.3",
+    "ipfs-http-client": "^60.0.0",
     "web3": "^1.8.2"
   }
 }
