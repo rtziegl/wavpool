@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import * as IPFS from "ipfs-core";
 import { ethers } from "ethers";
 import abi from "../../contract_utils/Competition.json";
-export let nftUris = [];
 
 export default function MetaForm({ cid }) {
     const [title, setTitle] = useState('');
@@ -13,7 +12,7 @@ export default function MetaForm({ cid }) {
     const [beat, setBeat] = useState(cid);
 
     const [currentAccount, setCurrentAccount] = useState("");
-    const contractAddress = "0xfcA9C127Dc84B8a950e75de7d778B2A381e23BC6";
+    const contractAddress = "0x62c921f6EFf43333970Ae7650BF9aa110D2b28D2";
     const contractABI = abi.abi;
 
     const mint = async (nftUri) => {
@@ -44,7 +43,6 @@ export default function MetaForm({ cid }) {
         const results = await node.add(json)
         let nftUri = 'ipfs://'
         nftUri += results.path
-        nftUris.push(nftUri)
         console.log(nftUri)
         mint(nftUri)
     }

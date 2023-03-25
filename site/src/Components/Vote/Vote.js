@@ -1,16 +1,24 @@
-import { nftUris } from "../Mint/MetaForm";
 import React, { useEffect, useState } from "react";
 import * as IPFS from "ipfs-core";
-const makeIpfsFetch = require('ipfs-fetch')
+//import { create } from 'ipfs-http-client'
+const BufferList = require('bl/BufferList')
+
 export default function Vote(){
-    console.log(nftUris)
+    const [file, setFile] = useState("")
+    const playBeat = () => {
+        console.log(file)
+        file.play()
+      };
 
     const getCompetitorsWavs = async () => {
         try {
-            const ipfs = await IPFS.create()
-            const fetch = await makeIpfsFetch({ipfs})
+            let cid = "QmT1gBqqa8PdsdiAUeAjqTbWWeqYGiJSmhnojZQqdjq8XX";
+            const sound = new Audio("https://ipfs.io/ipfs/" + cid)
+            setFile(sound)
+
         } catch (error) {
             console.log(error)
+            console.log("hi")
         }
     }
 
@@ -20,6 +28,7 @@ export default function Vote(){
 
     return(
         <div>
+            <button onClick={playBeat}> play </button>
             Vote
         </div>
     );
