@@ -41,6 +41,7 @@ contract Competition is ERC721URIStorage {
     mapping(address => Competitor) private _users;
     mapping(address => Admin) private _admins;
     mapping(uint256 => Comp) private _comps;
+    mapping(address => mapping(uint256 => Market)) private _market;
     uint256 private _compIds;
 
     // Voting and Leader States.
@@ -58,6 +59,9 @@ contract Competition is ERC721URIStorage {
 
     //Holds all users addresses that have bought in.
     address[] private _allCompetitors;
+
+    // Minting fee.
+    uint256 private mintingFee = 0.001 ether;
 
     // Events.
     event Start(uint256, uint256, string, string);
@@ -90,6 +94,12 @@ contract Competition is ERC721URIStorage {
 
     struct Admin {
         address adminAddress;
+    }
+
+    struct Market{
+        address usersMarket;
+        uint256 tokenID;
+        uint256 cost;
     }
 
     constructor() ERC721("wavpool NFT", "WAVP") {
@@ -187,10 +197,9 @@ contract Competition is ERC721URIStorage {
         else if (msg.value != _comps[_compIds].costToJoin)
             revert IncorrectPaymentAmount();
         else {
-
-            uint256[3] memory dummyArray;
             // If competitor doesn't exist make a new competitor.
             if (_users[msg.sender].user != msg.sender) {
+                uint256[3] memory dummyArray;
                 _users[msg.sender] = Competitor(
                     msg.sender,
                     0,
@@ -220,18 +229,46 @@ contract Competition is ERC721URIStorage {
         }
     }
 
-    // Mints an NFT as long as isInComp is true.
-    function mintNFT(
-        string memory tokenURI
-    ) public isInComp hasNotMinted returns (uint256) {
+    // Mints an NFT.
+    function mintNFT (string memory tokenURI) private {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
-        _users[msg.sender].nftCountPerComp += 1;
         _users[msg.sender].nftCountAllTime += 1;
-        _comps[_compIds].uris.push(tokenURI);
-        return newItemId;
+    }
+
+    // In Competition mints for free.  Out of competition mints for a small fee.
+    function mintNFTLogic(
+        string memory tokenURI
+    ) public payable {
+        if(checkIfUserInCompetition() && _users[msg.sender].nftCountPerComp < 1){
+            mintNFT(tokenURI);
+            _users[msg.sender].nftCountPerComp += 1;
+            _comps[_compIds].uris.push(tokenURI);
+        }
+        else {
+            if (msg.value != mintingFee)
+                revert IncorrectPaymentAmount();
+            else{
+                if (_users[msg.sender].user != msg.sender) {
+                    uint256[3] memory dummyArray;
+                    _users[msg.sender] = Competitor(
+                        msg.sender,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        dummyArray,
+                        0
+                    );
+                    mintNFT(tokenURI);
+                }
+                else
+                    mintNFT(tokenURI);
+            }
+        }
     }
 
     // Starts competition.
@@ -343,10 +380,6 @@ contract Competition is ERC721URIStorage {
     // Subtracts the one vote alloted on buyin (cannot vote again).
     // Adds one vote to the user thats been voted for.
     function vote(address voteFor) public isInComp canVote {
-        /*require(
-            msg.sender != voteFor,
-            "CVS"
-        );*/
         if (msg.sender == voteFor)
             revert CannotVoteForSelf();
         else {
