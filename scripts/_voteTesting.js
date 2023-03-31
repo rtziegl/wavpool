@@ -30,15 +30,16 @@ const main = async () => {
     await compContract.connect(randomPerson).vote(randomPerson1.address)
     await compContract.connect(randomPerson1).vote(randomPerson.address)
     await compContract.connect(randomPerson2).vote(randomPerson1.address)
-
+    //console.log(await compContract.getWinners())
     console.log(await compContract.getCompetitionStats())
     await await compContract.endCompetition()
-    console.log("USERS:" ,await compContract.getAllUsers())
+    console.log(await compContract.getWinners())
+    /*console.log("USERS:" ,await compContract.getAllUsers())
     await compContract.startCompetition(51, hre.ethers.utils.parseEther('0.01') , "Beat");
     await compContract.connect(randomPerson).buyin(buyTXoptions)
     await compContract.connect(randomPerson1).buyin(buyTXoptions)
     await compContract.connect(randomPerson2).buyin(buyTXoptions)
-    console.log("USERS:" ,await compContract.getAllUsers())
+    console.log("USERS:" ,await compContract.getAllUsers())*/
 
 
 

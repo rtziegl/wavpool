@@ -5,9 +5,37 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
+
+/****************************************************/
+/*  
+    Error Codes:
+    NAO -> Not admin or owner. Therefore, not allowed.
+    NO -> Not owner. Not allowed.
+    UNIC -> User not in competition and cannot mint for free.
+    UAM -> User has already minted.  Only one mint per user allowed per competition.
+    UAV -> User has already voted.  Can only vote once per competition.
+    UAT -> User has already purchased a ticket.
+    NSL -> No spots left in competition.
+    IPA -> Incorrect Payment Amount.
+    CVS -> Not allowed to vote for yourself to win competition.
+    FHE -> The first competition hasn't ended.
+*/
+/****************************************************/
+
 contract Competition is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
+
+    error NotAdminOrOwner();
+    error NotOwner();
+    error NotInCompetition();
+    error AlreadyMinted();
+    error AlreadyVoted();
+    error AlreadyPurchasedTicket();
+    error NoSpotsLeft();
+    error IncorrectPaymentAmount();
+    error CannotVoteForSelf();
+    error FirstCompetitionNotEnded();
 
     // Comp, Competitor, Admin mappings.
     mapping(address => Competitor) private _users;
@@ -39,10 +67,10 @@ contract Competition is ERC721URIStorage {
 
     struct Competitor {
         address user;
-        uint256 nftCountPerComp;
+        uint32 nftCountPerComp;
         uint256 nftCountAllTime;
-        uint256 allotedVotesPerComp;
-        int256 gainedVotesPerComp;
+        uint8 allotedVotesPerComp;
+        int32 gainedVotesPerComp;
         int256 gainedVotesAllTime;
         uint256[3] amtOfLeaderPlacements;
         uint256 amtOfCompsEntered;
@@ -71,25 +99,26 @@ contract Competition is ERC721URIStorage {
 
     // Ensuring admin or Owner is using a function.
     modifier onlyAdmins() {
-        require(
-            msg.sender == _admins[msg.sender].adminAddress ||
-                msg.sender == owner,
-            "Not Admin or Owner. Therefore, not allowed."
-        );
-        _;
+        if(msg.sender == _admins[msg.sender].adminAddress ||
+                msg.sender == owner)
+                _;
+        else 
+            revert NotAdminOrOwner();
     }
 
     // Allows me to ensure ownership.
     modifier onlyOwner() {
-        require(msg.sender == owner, "Not owner, not allowed.");
-        _;
+        if(msg.sender == owner)
+            _;
+        else
+            revert NotOwner();
     }
 
     // Ensures user is in competition before being able to mint an nft.
     modifier isInComp() {
         require(
             checkIfUserInCompetition(),
-            "User is not a part of the current competition and therefore cannot mint."
+            "UNIC"
         );
         _;
     }
@@ -98,18 +127,26 @@ contract Competition is ERC721URIStorage {
     modifier hasNotMinted() {
         require(
             _users[msg.sender].nftCountPerComp < 1,
-            "User has already minted.  Only one mint per user allowed per competition."
+            "UAM"
         );
         _;
     }
 
     // Ensures user has not already voted.
     modifier canVote() {
-        require(
-            _users[msg.sender].allotedVotesPerComp == 1,
-            "User has already voted.  Can only vote once per competition."
-        );
-        _;
+        if (_users[msg.sender].allotedVotesPerComp == 1)
+            _;
+        else 
+            revert AlreadyVoted();
+    }
+
+    // Ensures first competition has ended.
+    modifier firstCompHasEnded(){
+         //require(_compIds >= 1, "FHE");
+        if (_compIds >= 1)
+            _;
+        else
+            revert FirstCompetitionNotEnded();
     }
 
     // Allows an ownership check to be returned.
@@ -143,48 +180,44 @@ contract Competition is ERC721URIStorage {
 
     // Allows for buyin to competition.
     function buyin() public payable {
-        require(
-            !checkIfUserInCompetition(),
-            "User has already purchased a ticket."
-        );
-        require(
-            _comps[_compIds].totalSpotsInComp > 0,
-            "No spots left in competition."
-        );
-        require(
-            msg.value == _comps[_compIds].costToJoin,
-            "Incorrect payment amount."
-        );
-
-        uint256[3] memory dummyArray;
-        // If competitor doesn't exist make a new competitor.
-        if (_users[msg.sender].user != msg.sender) {
-            _users[msg.sender] = Competitor(
-                msg.sender,
-                0,
-                0,
-                1,
-                0,
-                0,
-                dummyArray,
-                0
-            );
-
-            _allCompetitors.push(msg.sender);
-        }
-        // If competitior does already exist reset their alloted votes, gained votes and nft count.
+        if (checkIfUserInCompetition())
+            revert AlreadyPurchasedTicket();
+        else if (_comps[_compIds].totalSpotsInComp == 0)
+            revert NoSpotsLeft();
+        else if (msg.value != _comps[_compIds].costToJoin)
+            revert IncorrectPaymentAmount();
         else {
-            _users[msg.sender].allotedVotesPerComp = 1;
-            _users[msg.sender].gainedVotesPerComp = 0;
-            _users[msg.sender].nftCountPerComp = 0;
+
+            uint256[3] memory dummyArray;
+            // If competitor doesn't exist make a new competitor.
+            if (_users[msg.sender].user != msg.sender) {
+                _users[msg.sender] = Competitor(
+                    msg.sender,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    dummyArray,
+                    0
+                );
+
+                _allCompetitors.push(msg.sender);
+            }
+            // If competitior does already exist reset their alloted votes, gained votes and nft count.
+            else {
+                _users[msg.sender].allotedVotesPerComp = 1;
+                _users[msg.sender].gainedVotesPerComp = 0;
+                _users[msg.sender].nftCountPerComp = 0;
+            }
+
+            _comps[_compIds].usersInComp.push(msg.sender);
+            _comps[_compIds].totalSpotsInComp -= 1;
+
+            _users[msg.sender].amtOfCompsEntered += 1;
+
+            emit Buyin(msg.sender);
         }
-
-        _comps[_compIds].usersInComp.push(msg.sender);
-        _comps[_compIds].totalSpotsInComp -= 1;
-
-        _users[msg.sender].amtOfCompsEntered += 1;
-
-        emit Buyin(msg.sender);
     }
 
     // Mints an NFT as long as isInComp is true.
@@ -310,12 +343,16 @@ contract Competition is ERC721URIStorage {
     // Subtracts the one vote alloted on buyin (cannot vote again).
     // Adds one vote to the user thats been voted for.
     function vote(address voteFor) public isInComp canVote {
-        require(
+        /*require(
             msg.sender != voteFor,
-            "Not allowed to vote for yourself to win."
-        );
+            "CVS"
+        );*/
+        if (msg.sender == voteFor)
+            revert CannotVoteForSelf();
+        else {
         _users[msg.sender].allotedVotesPerComp -= 1;
         _users[voteFor].gainedVotesPerComp += 1;
+        }
     }
 
     // Returns all competitors that have ever bought in.
@@ -354,8 +391,7 @@ contract Competition is ERC721URIStorage {
     }
 
     //Returns the winner after the first competition ends and every competition after that ends.
-    function getWinners() public view returns (address[] memory) {
-        require(_compIds >= 1, "The first competition hasn't ended.");
+    function getWinners() public firstCompHasEnded view returns (address[] memory) {
         return _comps[_compIds - 1].winners;
     }
 

@@ -13,12 +13,23 @@ const main = async () => {
 
     console.log("Contract deployed by:", owner.address);
     var buyTXoptions = { value: hre.ethers.utils.parseEther('0.01') }
+    var buyTXoptions2 = { value: hre.ethers.utils.parseEther('0.001') }
     var btx = hre.ethers.utils.parseEther('0.01') 
+    //await compContract.addAdmin(randomPerson.address)
+    //await compContract.connect(randomPerson).addAdmin(randomPerson.address)
+    //await compContract.connect(randomPerson).startCompetition(50, btx, "Beat")
+    await compContract.startCompetition(1, btx, "Beat")
+    console.log(await compContract.getCompetitionStats())
+    //await compContract.buyin(buyTXoptions)
+    //await compContract.connect(randomPerson).buyin(buyTXoptions2)
+    console.log(await compContract.getCompetitionStats())
+    await compContract.getWinners()
+    await compContract.cancelCompetition()
     await compContract.startCompetition(50, btx, "Beat")
-    await compContract.buyin(buyTXoptions)
+    console.log(await compContract.getCompetitionStats())
 
     // Minting the token
-    const transaction= await compContract.mintNFT(
+    /*const transaction= await compContract.mintNFT(
         metadata,
         {
           gasLimit: 500_000,
@@ -30,7 +41,7 @@ const main = async () => {
     const tokenId = value.toNumber(); // Getting the tokenID
     const tokenURI = await compContract.tokenURI(tokenId) // Using the tokenURI from ERC721 to retrieve de metadata
     console.log(tokenId)
-    console.log(tokenURI)
+    console.log(tokenURI)*/
   };
   
   const runMain = async () => {
