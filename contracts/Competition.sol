@@ -5,23 +5,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-
-/****************************************************/
-/*  
-    Error Codes:
-    NAO -> Not admin or owner. Therefore, not allowed.
-    NO -> Not owner. Not allowed.
-    UNIC -> User not in competition and cannot mint for free.
-    UAM -> User has already minted.  Only one mint per user allowed per competition.
-    UAV -> User has already voted.  Can only vote once per competition.
-    UAT -> User has already purchased a ticket.
-    NSL -> No spots left in competition.
-    IPA -> Incorrect Payment Amount.
-    CVS -> Not allowed to vote for yourself to win competition.
-    FHE -> The first competition hasn't ended.
-*/
-/****************************************************/
-
 contract Competition is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
@@ -41,7 +24,6 @@ contract Competition is ERC721URIStorage {
     mapping(address => Competitor) private _users;
     mapping(address => Admin) private _admins;
     mapping(uint256 => Comp) private _comps;
-    mapping(address => mapping(uint256 => Market)) private _market;
     uint256 private _compIds;
 
     // Voting and Leader States.
@@ -49,17 +31,15 @@ contract Competition is ERC721URIStorage {
     int256 private _amtOfVotesForLeader;
     uint256 private _leaderIndex;
     uint256 private _leaderCount;
-
     // No user Address.
     address private constant _DELETEDUSER =
         0x0000000000000000000000000000000000000000;
-
     // Owner address.
     address private owner;
-
     //Holds all users addresses that have bought in.
     address[] private _allCompetitors;
-
+    //Holds all the users tokenIds.
+    uint256[] private _allIds;
     // Minting fee.
     uint256 private mintingFee = 0.001 ether;
 
@@ -83,7 +63,7 @@ contract Competition is ERC721URIStorage {
     struct Comp {
         address[] usersInComp;
         address[] winners;
-        string[] uris;
+        uint256[] tokenIds;
         uint256 costToJoin;
         uint256 totalSpotsInComp;
         uint256 compId;
@@ -96,12 +76,6 @@ contract Competition is ERC721URIStorage {
         address adminAddress;
     }
 
-    struct Market{
-        address usersMarket;
-        uint256 tokenID;
-        uint256 cost;
-    }
-
     constructor() ERC721("wavpool NFT", "WAVP") {
         _comps[_compIds].isCompStarted = false;
         owner = msg.sender;
@@ -109,54 +83,42 @@ contract Competition is ERC721URIStorage {
 
     // Ensuring admin or Owner is using a function.
     modifier onlyAdmins() {
-        if(msg.sender == _admins[msg.sender].adminAddress ||
-                msg.sender == owner)
-                _;
-        else 
-            revert NotAdminOrOwner();
+        if (
+            msg.sender == _admins[msg.sender].adminAddress ||
+            msg.sender == owner
+        ) _;
+        else revert NotAdminOrOwner();
     }
 
     // Allows me to ensure ownership.
     modifier onlyOwner() {
-        if(msg.sender == owner)
-            _;
-        else
-            revert NotOwner();
+        if (msg.sender == owner) _;
+        else revert NotOwner();
     }
 
     // Ensures user is in competition before being able to mint an nft.
     modifier isInComp() {
-        require(
-            checkIfUserInCompetition(),
-            "UNIC"
-        );
+        require(checkIfUserInCompetition(), "UNIC");
         _;
     }
 
     // Ensures user has not already minted during the competition.
     modifier hasNotMinted() {
-        require(
-            _users[msg.sender].nftCountPerComp < 1,
-            "UAM"
-        );
+        require(_users[msg.sender].nftCountPerComp < 1, "UAM");
         _;
     }
 
     // Ensures user has not already voted.
     modifier canVote() {
-        if (_users[msg.sender].allotedVotesPerComp == 1)
-            _;
-        else 
-            revert AlreadyVoted();
+        if (_users[msg.sender].allotedVotesPerComp == 1) _;
+        else revert AlreadyVoted();
     }
 
     // Ensures first competition has ended.
-    modifier firstCompHasEnded(){
-         //require(_compIds >= 1, "FHE");
-        if (_compIds >= 1)
-            _;
-        else
-            revert FirstCompetitionNotEnded();
+    modifier firstCompHasEnded() {
+        //require(_compIds >= 1, "FHE");
+        if (_compIds >= 1) _;
+        else revert FirstCompetitionNotEnded();
     }
 
     // Allows an ownership check to be returned.
@@ -190,10 +152,8 @@ contract Competition is ERC721URIStorage {
 
     // Allows for buyin to competition.
     function buyin() public payable {
-        if (checkIfUserInCompetition())
-            revert AlreadyPurchasedTicket();
-        else if (_comps[_compIds].totalSpotsInComp == 0)
-            revert NoSpotsLeft();
+        if (checkIfUserInCompetition()) revert AlreadyPurchasedTicket();
+        else if (_comps[_compIds].totalSpotsInComp == 0) revert NoSpotsLeft();
         else if (msg.value != _comps[_compIds].costToJoin)
             revert IncorrectPaymentAmount();
         else {
@@ -221,52 +181,58 @@ contract Competition is ERC721URIStorage {
             }
 
             _comps[_compIds].usersInComp.push(msg.sender);
-            _comps[_compIds].totalSpotsInComp -= 1;
+            _comps[_compIds].totalSpotsInComp--;
 
-            _users[msg.sender].amtOfCompsEntered += 1;
+            _users[msg.sender].amtOfCompsEntered++;
 
             emit Buyin(msg.sender);
         }
     }
 
     // Mints an NFT.
-    function mintNFT (string memory tokenURI) private {
+    function mintNFT(string memory tokenURI) private returns (uint256) {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
         _users[msg.sender].nftCountAllTime += 1;
+        _allIds.push(newItemId);
+        return newItemId;
     }
 
     // In Competition mints for free.  Out of competition mints for a small fee.
     function mintNFTLogic(
         string memory tokenURI
-    ) public payable {
-        if(checkIfUserInCompetition() && _users[msg.sender].nftCountPerComp < 1){
-            mintNFT(tokenURI);
+    ) public payable returns (uint256) {
+        uint256 tokenId;
+        if (
+            checkIfUserInCompetition() && _users[msg.sender].nftCountPerComp < 1
+        ) {
+            tokenId = mintNFT(tokenURI);
             _users[msg.sender].nftCountPerComp += 1;
-            _comps[_compIds].uris.push(tokenURI);
-        }
-        else {
-            if (msg.value != mintingFee)
-                revert IncorrectPaymentAmount();
-            else{
+            _comps[_compIds].tokenIds.push(tokenId);
+            return tokenId;
+        } else {
+            if (msg.value != mintingFee) revert IncorrectPaymentAmount();
+            else {
                 if (_users[msg.sender].user != msg.sender) {
-                    uint256[3] memory dummyArray;
+                    uint256[3] memory emptyArray;
                     _users[msg.sender] = Competitor(
                         msg.sender,
                         0,
                         0,
-                        1,
                         0,
                         0,
-                        dummyArray,
+                        0,
+                        emptyArray,
                         0
                     );
-                    mintNFT(tokenURI);
+                    tokenId = mintNFT(tokenURI);
+                    return tokenId;
+                } else {
+                    tokenId = mintNFT(tokenURI);
+                    return tokenId;
                 }
-                else
-                    mintNFT(tokenURI);
             }
         }
     }
@@ -278,11 +244,11 @@ contract Competition is ERC721URIStorage {
         string memory typeComp
     ) public onlyAdmins {
         address[] memory emptyAddress;
-        string[] memory emptyString;
+        uint256[] memory emptyUint;
         _comps[_compIds] = Comp(
             emptyAddress,
             emptyAddress,
-            emptyString,
+            emptyUint,
             cost,
             spots,
             _compIds,
@@ -330,7 +296,7 @@ contract Competition is ERC721URIStorage {
             // just whoever bought in first (rare case).
             _amtOfVotesForLeader = -1;
             // Winner found.
-            _leaderCount += 1;
+            _leaderCount++;
             endCompetition();
         } else {
             // Half of competition buyin price stays in contract.  Other half dispersed among winners.
@@ -346,9 +312,7 @@ contract Competition is ERC721URIStorage {
                 payoutAddress.transfer(compBalance);
 
                 // Adds 1 to amtOfLeaderPlacements[i] which means they came in 1st, 2nd or, 3rd.
-                _users[_comps[_compIds].winners[i]].amtOfLeaderPlacements[
-                    i
-                ] += 1;
+                _users[_comps[_compIds].winners[i]].amtOfLeaderPlacements[i]++;
 
                 //Emit Payout event which is the winners address, the amount payed and the place the user came in.
                 emit Payout(
@@ -361,7 +325,7 @@ contract Competition is ERC721URIStorage {
             // Gather up all gained votes for each competitor.
             tallyVotes();
             //Increasing ID for next competition.
-            _compIds += 1;
+            _compIds++;
             // Resets _leaderCount.
             _leaderCount = 0;
             // Sets hasCompEnded to true;
@@ -372,7 +336,7 @@ contract Competition is ERC721URIStorage {
     }
 
     // ALlows admins to cancel the competition by deleting the comp.
-    function cancelCompetition() public onlyAdmins{
+    function cancelCompetition() public onlyAdmins {
         delete _comps[_compIds];
     }
 
@@ -380,11 +344,10 @@ contract Competition is ERC721URIStorage {
     // Subtracts the one vote alloted on buyin (cannot vote again).
     // Adds one vote to the user thats been voted for.
     function vote(address voteFor) public isInComp canVote {
-        if (msg.sender == voteFor)
-            revert CannotVoteForSelf();
+        if (msg.sender == voteFor) revert CannotVoteForSelf();
         else {
-        _users[msg.sender].allotedVotesPerComp -= 1;
-        _users[voteFor].gainedVotesPerComp += 1;
+            _users[msg.sender].allotedVotesPerComp--;
+            _users[voteFor].gainedVotesPerComp++;
         }
     }
 
@@ -403,7 +366,7 @@ contract Competition is ERC721URIStorage {
         returns (
             uint256,
             address[] memory,
-            string[] memory,
+            uint256[] memory,
             string memory,
             uint256,
             uint256,
@@ -414,7 +377,7 @@ contract Competition is ERC721URIStorage {
         return (
             _comps[_compIds].compId,
             _comps[_compIds].usersInComp,
-            _comps[_compIds].uris,
+            _comps[_compIds].tokenIds,
             _comps[_compIds].typeOfComp,
             _comps[_compIds].totalSpotsInComp,
             _comps[_compIds].costToJoin,
@@ -424,7 +387,12 @@ contract Competition is ERC721URIStorage {
     }
 
     //Returns the winner after the first competition ends and every competition after that ends.
-    function getWinners() public firstCompHasEnded view returns (address[] memory) {
+    function getWinners()
+        public
+        view
+        firstCompHasEnded
+        returns (address[] memory)
+    {
         return _comps[_compIds - 1].winners;
     }
 
@@ -458,6 +426,11 @@ contract Competition is ERC721URIStorage {
     // Returns current balance of contract.
     function getBalanceOfContract() public view onlyOwner returns (uint256) {
         return address(this).balance;
+    }
+
+    //Returns all token Id's.
+    function getAllIds() public view returns (uint256[] memory) {
+        return _allIds;
     }
 
     // Withdraws money from contract to owner.

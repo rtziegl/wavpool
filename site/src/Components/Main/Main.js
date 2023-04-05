@@ -12,7 +12,7 @@ export default function Main() {
     const [compSpots, setCompSpots] = useState("");
     const [compCost, setCompCost] = useState("");
     const [compStarted, setCompStarted] = useState(false)
-    const contractAddress = "0x62c921f6EFf43333970Ae7650BF9aa110D2b28D2";
+    const contractAddress = "0xCf9B7f05035232a128Cfe89D5135e1dCa3508ef3";
     const contractABI = abi.abi;
 
     //Gets competition stats from Competition.sol.
@@ -94,7 +94,7 @@ export default function Main() {
                     <div className='vl'></div>
                     <div className="child2">
                         {compStarted && (<div className='left-box'>
-                            <li className='main-li'>Competition #{compTitle}</li>
+                            <li className='main-li'>Competition: {compTitle}</li>
                             <li className='main-li'>Type: {compType}</li>
                             <li className='main-li'>Cost to join: {compCost} ETH</li>
                             <li className='main-li'>Spots remaining: {compSpots}</li>

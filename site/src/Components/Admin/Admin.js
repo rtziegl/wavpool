@@ -7,7 +7,7 @@ export default function Admin(){
     const [spots, setSpots] = useState("");
     const [cost, setCost] = useState("");
     const [type, setType] = useState("");
-    const contractAddress = "0x62c921f6EFf43333970Ae7650BF9aa110D2b28D2";
+    const contractAddress = "0xCf9B7f05035232a128Cfe89D5135e1dCa3508ef3";
     const contractABI = abi.abi;
 
     const startComp = async () => {

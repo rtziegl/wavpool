@@ -22,7 +22,7 @@ export default function Navbar() {
   const [currentAccount, setCurrentAccount] = useState("No account connected.");
   const [connected, toggleConnect] = useState(false);
   const [owner, setOwner] = useState(false);
-  const contractAddress = "0x8E6C0104EA3De7A201F8ebA1D0aDe6a026e0bFE2";
+  const contractAddress = "0xCf9B7f05035232a128Cfe89D5135e1dCa3508ef3";
   const contractABI = abi.abi;
   
 
@@ -39,7 +39,7 @@ export default function Navbar() {
         setCurrentAccount(account);
         toggleConnect(true)
 
-        if (await compContract.checkIfOwner() == true || await compContract.checkIfAdmin()){
+        if (await compContract.checkIfOwner() == true || await compContract.checkIfAdmin() == true){
           console.log("OWNER")
           setOwner(true)
         }

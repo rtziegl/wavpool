@@ -6,7 +6,7 @@ const web3 = require('web3');
 export default function Leaderboard() {
     const [competitors, setCompetitors] = useState([]);
     const getLeaderboardStats = async () => {
-        const contractAddress = "0x62c921f6EFf43333970Ae7650BF9aa110D2b28D2";
+        const contractAddress = "0xCf9B7f05035232a128Cfe89D5135e1dCa3508ef3";
         const contractABI = abi.abi;
         let amtOfLeaders = []
 

@@ -22,14 +22,15 @@ const main = async () => {
     console.log(await compContract.getCompetitionStats())
     //await compContract.buyin(buyTXoptions)
     //await compContract.connect(randomPerson).buyin(buyTXoptions2)
-    console.log(await compContract.getCompetitionStats())
+   /* console.log(await compContract.getCompetitionStats())
     await compContract.getWinners()
     await compContract.cancelCompetition()
     await compContract.startCompetition(50, btx, "Beat")
     console.log(await compContract.getCompetitionStats())
+    */
 
     // Minting the token
-    /*const transaction= await compContract.mintNFT(
+    const transaction= await compContract.mintNFT(
         metadata,
         {
           gasLimit: 500_000,
@@ -41,7 +42,7 @@ const main = async () => {
     const tokenId = value.toNumber(); // Getting the tokenID
     const tokenURI = await compContract.tokenURI(tokenId) // Using the tokenURI from ERC721 to retrieve de metadata
     console.log(tokenId)
-    console.log(tokenURI)*/
+    console.log(tokenURI)
   };
   
   const runMain = async () => {
