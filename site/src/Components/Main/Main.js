@@ -38,12 +38,15 @@ export default function Main() {
                 // Conversion from wei to actual amount of eth.
                 let costInEth = web3.utils.fromWei(web3.utils.hexToNumberString(compInfo[4]._hex, 'ether'))
                 console.log(compInfo)
-                if (compInfo[5] == true) {
+                if (compInfo[5] == true && compInfo[6] == false) {
                     setCompStarted(true)
                     setCompTitle(parseInt(compInfo[0]._hex, 16))
                     setCompType(compInfo[2])
                     setCompSpots(parseInt(compInfo[3]._hex, 16))
                     setCompCost(costInEth)
+                }
+                else if (compInfo[6] == true){
+                    setCompStarted(false)
                 }
             }
         } catch (error) {

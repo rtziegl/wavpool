@@ -26,11 +26,6 @@ contract Competition is ERC721URIStorage {
     mapping(uint256 => Comp) private _comps;
     uint256 private _compIds;
 
-    // Voting and Leader States.
-    address private _voteLeader;
-    int256 private _amtOfVotesForLeader;
-    uint256 private _leaderIndex;
-    uint256 private _leaderCount;
     // No user Address.
     address private constant _DELETEDUSER =
         0x0000000000000000000000000000000000000000;
@@ -42,12 +37,6 @@ contract Competition is ERC721URIStorage {
     uint256[] private _allIds;
     // Minting fee.
     uint256 private mintingFee = 0.001 ether;
-
-    // Events.
-    event Start(uint256, uint256, string, string);
-    event Buyin(address);
-    event Payout(address, uint256, uint256);
-    event End(address[], string);
 
     struct Competitor {
         address user;
@@ -70,6 +59,10 @@ contract Competition is ERC721URIStorage {
         bool isCompStarted;
         bool hasCompEnded;
         string typeOfComp;
+        address voteLeader;
+        int256  amtOfVotesForLeader;
+        uint256 leaderIndex;
+        uint256 leaderCount;
     }
 
     struct Admin {
@@ -185,7 +178,6 @@ contract Competition is ERC721URIStorage {
 
             _users[msg.sender].amtOfCompsEntered++;
 
-            emit Buyin(msg.sender);
         }
     }
 
@@ -254,49 +246,42 @@ contract Competition is ERC721URIStorage {
             _compIds,
             true,
             false,
-            typeComp
+            typeComp,
+            _DELETEDUSER,
+            0,
+            0,
+            0
         );
 
-        // Emit start event.
-        emit Start(
-            spots,
-            cost,
-            typeComp,
-            string.concat(
-                "Competition ",
-                Strings.toString(_compIds),
-                " has started."
-            )
-        );
     }
 
     // Ends a competition and finds winners.
     function endCompetition() public onlyAdmins {
         // Only three winners allowed.
-        if (_leaderCount <= 2) {
+        if (_comps[_compIds].leaderCount <= 2) {
             // Finds leader.
             for (uint256 i = 0; i < _comps[_compIds].usersInComp.length; i++) {
                 if (
                     _users[_comps[_compIds].usersInComp[i]].gainedVotesPerComp >
-                    _amtOfVotesForLeader &&
+                    _comps[_compIds].amtOfVotesForLeader &&
                     _comps[_compIds].usersInComp[i] != _DELETEDUSER
                 ) {
-                    _voteLeader = _users[_comps[_compIds].usersInComp[i]].user;
-                    _amtOfVotesForLeader = _users[
+                    _comps[_compIds].voteLeader = _users[_comps[_compIds].usersInComp[i]].user;
+                    _comps[_compIds].amtOfVotesForLeader = _users[
                         _comps[_compIds].usersInComp[i]
                     ].gainedVotesPerComp;
-                    _leaderIndex = i;
+                    _comps[_compIds].leaderIndex = i;
                 }
             }
             // Adds top vote leader, tie goes to earlier buyin.
-            _comps[_compIds].winners.push(_voteLeader);
+            _comps[_compIds].winners.push(_comps[_compIds].voteLeader);
             // Deletes user from comp.
-            delete _comps[_compIds].usersInComp[_leaderIndex];
+            delete _comps[_compIds].usersInComp[_comps[_compIds].leaderIndex];
             // Resets votes for leader to -1 which allows 2nd and third to be no votes
             // just whoever bought in first (rare case).
-            _amtOfVotesForLeader = -1;
+            _comps[_compIds].amtOfVotesForLeader = -1;
             // Winner found.
-            _leaderCount++;
+            _comps[_compIds].leaderCount++;
             endCompetition();
         } else {
             // Half of competition buyin price stays in contract.  Other half dispersed among winners.
@@ -314,24 +299,14 @@ contract Competition is ERC721URIStorage {
                 // Adds 1 to amtOfLeaderPlacements[i] which means they came in 1st, 2nd or, 3rd.
                 _users[_comps[_compIds].winners[i]].amtOfLeaderPlacements[i]++;
 
-                //Emit Payout event which is the winners address, the amount payed and the place the user came in.
-                emit Payout(
-                    _users[_comps[_compIds].winners[i]].user,
-                    compBalance,
-                    i
-                );
             }
 
             // Gather up all gained votes for each competitor.
             tallyVotes();
             //Increasing ID for next competition.
             _compIds++;
-            // Resets _leaderCount.
-            _leaderCount = 0;
             // Sets hasCompEnded to true;
             _comps[_compIds].hasCompEnded = true;
-            // Emit end event which is the array of winners.
-            emit End(_comps[_compIds].winners, "Competition Ended.");
         }
     }
 

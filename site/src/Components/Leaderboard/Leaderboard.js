@@ -5,10 +5,12 @@ const { ethers } = require("ethers");
 const web3 = require('web3');
 export default function Leaderboard() {
     const [competitors, setCompetitors] = useState([]);
+    const [emptyLeaderboard, setEmpty] = useState(false);
+
     const getLeaderboardStats = async () => {
         const contractAddress = "0xCf9B7f05035232a128Cfe89D5135e1dCa3508ef3";
         const contractABI = abi.abi;
-        let amtOfLeaders = []
+        let amtOfLeaders = [];
 
         try {
             const { ethereum } = window;
@@ -17,27 +19,32 @@ export default function Leaderboard() {
                 const provider = new ethers.providers.Web3Provider(ethereum);
                 const signer = provider.getSigner();
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
-                let allCompetitors = await compContract.getAllUsers()
+                let allCompetitors = await compContract.getAllUsers();
 
-                for (let i = 0; i < allCompetitors.length; i++) {
-                    let competitorInfo = await compContract.getCompetitorStats(allCompetitors[i]);
-                    for (let j = 0; j < competitorInfo[2].length; j++) {
-                        amtOfLeaders.push(web3.utils.hexToNumber(competitorInfo[2][j]));
-                    }
-                    const updateCompetitors = [
-                        ...competitors,
-                        {
-                            id: competitors.length + 1,
-                            address: competitorInfo[0],
-                            gainedVotesAllTime: web3.utils.hexToNumber(competitorInfo[1]),
-                            amtOfFirst: amtOfLeaders[0],
-                            amtOfSecond: amtOfLeaders[1],
-                            amtOfThird: amtOfLeaders[1],
-                            amtOfCompsEntered: web3.utils.hexToNumber(competitorInfo[3]),
-                            nftCountAllTime: web3.utils.hexToNumber(competitorInfo[4]),
+                if (allCompetitors.length == 0)
+                    setEmpty(true);
+                else{
+                    setEmpty(false)
+                    for (let i = 0; i < allCompetitors.length; i++) {
+                        let competitorInfo = await compContract.getCompetitorStats(allCompetitors[i]);
+                        for (let j = 0; j < competitorInfo[2].length; j++) {
+                            amtOfLeaders.push(web3.utils.hexToNumber(competitorInfo[2][j]));
                         }
-                    ];
-                    setCompetitors(updateCompetitors)
+                        const updateCompetitors = [
+                            ...competitors,
+                            {
+                                id: competitors.length + 1,
+                                address: competitorInfo[0],
+                                gainedVotesAllTime: web3.utils.hexToNumber(competitorInfo[1]),
+                                amtOfFirst: amtOfLeaders[0],
+                                amtOfSecond: amtOfLeaders[1],
+                                amtOfThird: amtOfLeaders[1],
+                                amtOfCompsEntered: web3.utils.hexToNumber(competitorInfo[3]),
+                                nftCountAllTime: web3.utils.hexToNumber(competitorInfo[4]),
+                            }
+                        ];
+                        setCompetitors(updateCompetitors)
+                    }
                 }
             }
 
@@ -53,7 +60,7 @@ export default function Leaderboard() {
     return (
         <div>
             Leaderboard
-            <ul>
+            {!emptyLeaderboard && (<ul>
                 {competitors.map(competitor => (
                     <li key={competitor.id}>
                         <p>{competitor.address}</p>
@@ -65,7 +72,8 @@ export default function Leaderboard() {
                         <p>{competitor.nftCountAllTime}</p>
                     </li>
                 ))}
-            </ul>
+            </ul>)}
+            {emptyLeaderboard && (<div>No Leaders yet</div>)}
         </div>
     );
 }
