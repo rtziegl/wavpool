@@ -91,14 +91,14 @@ contract Competition is ERC721URIStorage {
 
     // Ensures user is in competition before being able to mint an nft.
     modifier isInComp() {
-        require(checkIfUserInCompetition(), "UNIC");
-        _;
+        if (checkIfUserInCompetition()) _;
+        else revert NotInCompetition();
     }
 
     // Ensures user has not already minted during the competition.
     modifier hasNotMinted() {
-        require(_users[msg.sender].nftCountPerComp < 1, "UAM");
-        _;
+        if (_users[msg.sender].nftCountPerComp < 1) _;
+        else revert AlreadyMinted();
     }
 
     // Ensures user has not already voted.
