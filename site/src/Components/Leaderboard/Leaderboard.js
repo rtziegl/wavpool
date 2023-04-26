@@ -8,7 +8,7 @@ export default function Leaderboard() {
     const [emptyLeaderboard, setEmpty] = useState(false);
 
     const getLeaderboardStats = async () => {
-        const contractAddress = "0xCf9B7f05035232a128Cfe89D5135e1dCa3508ef3";
+        const contractAddress = "0x4e2F61DDAF59e21F022e42e6C2EF088FabD33853";
         const contractABI = abi.abi;
         let amtOfLeaders = [];
 

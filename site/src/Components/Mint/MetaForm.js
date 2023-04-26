@@ -12,7 +12,7 @@ export default function MetaForm({ cid }) {
     const [beat, setBeat] = useState(cid);
 
     const [currentAccount, setCurrentAccount] = useState("");
-    const contractAddress = "0xCf9B7f05035232a128Cfe89D5135e1dCa3508ef3";
+    const contractAddress = "0x4e2F61DDAF59e21F022e42e6C2EF088FabD33853";
     const contractABI = abi.abi;
 
     const mint = async (nftUri) => {
