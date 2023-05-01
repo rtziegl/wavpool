@@ -25,7 +25,7 @@ export default function MetaForm({ cid }) {
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
 
                 // Minting the token.
-                const transaction = await compContract.mintNFT(
+                const transaction = await compContract.mintNFTLogic(
                     nftUri,
                     {
                         gasLimit: 500_000,

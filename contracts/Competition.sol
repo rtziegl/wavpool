@@ -36,7 +36,7 @@ contract Competition is ERC721URIStorage {
     //Holds all the users tokenIds.
     uint256[] private _allIds;
     // Minting fee.
-    uint256 private mintingFee = 0.001 ether;
+    uint256 private mintingFee = 0.01 ether;
 
     struct Competitor {
         address user;

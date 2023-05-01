@@ -17,7 +17,6 @@ export default function Main() {
 
     //Gets competition stats from Competition.sol.
     const getCompStats = async () => {
-
         /*
         _comps[_compIds].compId, 0
         _comps[_compIds].usersInComp, 1
@@ -33,6 +32,8 @@ export default function Main() {
                 const provider = new ethers.providers.Web3Provider(ethereum);
                 const signer = provider.getSigner();
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
+                console.log(provider)
+                
     
                 let compInfo = await compContract.getCompetitionStats()
                 // Conversion from wei to actual amount of eth.
