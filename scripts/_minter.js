@@ -44,7 +44,11 @@ const main = async () => {
           gasLimit: 500_000,
         },*/
       )
-      const tx = await transaction.wait() 
+      let i = 0;
+      let x = false;
+      const tx = await transaction.wait()
+      
+      console.log(tx.status)
       const event = tx.events[0];
       const value = event.args[2];
       const tokenId = value.toNumber(); // Getting the tokenID

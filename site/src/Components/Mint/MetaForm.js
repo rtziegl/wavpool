@@ -23,22 +23,45 @@ export default function MetaForm({ cid }) {
                 const provider = new ethers.providers.Web3Provider(ethereum);
                 const signer = provider.getSigner();
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
-                // Minting the token.
-                await compContract.mintNFTLogic(
-                    nftUri,
-                    {
-                        gasLimit: 500_000,
-                    },
-                ).then((tx) => {
-                    provider.waitForTransaction(tx.hash)
-                    .then(()=>{
-                      console.log("success");
-                      console.log(tx.hash);
+                const buyTXoptions = { value: ethers.utils.parseEther('0.01'), gasLimit: 500_000}
+
+                const isUserInComp = await compContract.getIfUserInComp();
+
+                // User in comp (free mint + gas fee).
+                if (isUserInComp == true){
+                    // Minting the token.
+                    await compContract.mintNFTLogic(
+                        nftUri,
+                        {
+                            gasLimit: 500_000,
+                        },
+                    ).then((tx) => {
+                        provider.waitForTransaction(tx.hash)
+                        .then(()=>{
+                        console.log("success");
+                        console.log(tx.hash);
+                        })
                     })
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                  })
+                    .catch((error) => {
+                        console.log(error);
+                    })
+                }
+
+                // User not in comp (fee for mint + gas fee).
+                else {
+                    const transaction = await compContract.mintNFTLogic(
+                        nftUri,buyTXoptions
+                    )
+                    // Loading here.
+                    console.log("minting pls wait.")
+                    const tx = await transaction.wait()
+                    if (tx.status == 1) 
+                        console.log("success")
+                        // End loading here.
+                    else 
+                        console.log("fail")
+                }
+                
             }
         } catch (error) {
             console.log(error)
