@@ -25,9 +25,6 @@ export default function DragDropFile() {
   // Input ref.
   const inputRef = useRef(null);
 
-  //Cid ref.
-  const cid = useRef(null);
-
   // Handles drag events.
   const handleDrag = function (e) {
     e.preventDefault();
@@ -108,24 +105,6 @@ export default function DragDropFile() {
     audioObject.pause()
   };
 
-  // Add audio file to IPFS and get the cid.
-  const commitFileToIPFS = async () => {
-    const node = await IPFS.create({ repo: 'ok' + Math.random() })
-    const results = await node.add(file)
-
-    // Setting CID.
-    cid.current = "ipfs://"
-    cid.current += results.path
-
-    // Setting Metadata Screen.
-    setSubmit(true)
-
-    console.log(results)
-    console.log(results.path)
-    console.log({ cid })
-
-  }
-
   return (
     <div>
       {!justDropped && !correctFileType && <div className="wrap"><form id="form-file-upload" onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()}>
@@ -142,28 +121,21 @@ export default function DragDropFile() {
       </form></div>}
 
       {correctFileType && !justSubmitted && <div className="after-drop-bg">
-        <h3>File Preview</h3>
-        <div className="after-drop-top">
-          <div className="play-button">
-            {!click && <div onClick={play}><FaPlayCircle /></div>}
-            {click && <div onClick={pause}><FaPauseCircle /></div>}
+        <div className="after-drop-sm">
+          <h3>File Preview</h3>
+          <div className="after-drop-top">
+            <div className="play-button">
+              {!click && <div onClick={play}><FaPlayCircle /></div>}
+              {click && <div onClick={pause}><FaPauseCircle /></div>}
+            </div>
           </div>
+          <input ref={inputRef} type="file" id="input-file-upload" multiple={false} onChange={handleChange} onSubmit={(e) => e.preventDefault()} />
+          <button className="upload-button-1" onClick={onButtonClick}>Change File</button>
         </div>
-        <input ref={inputRef} type="file" id="input-file-upload" multiple={false} onChange={handleChange} onSubmit={(e) => e.preventDefault()} />
-        <button className="upload-button-1" onClick={onButtonClick}>Change File</button>
-        <h4>or</h4>
-        <div className="extra-button-space-1">
-          <button className="button-59" role="button" type="submit" onClick={commitFileToIPFS}>Upload</button>
-        </div>
-      </div>}
-
-      {justSubmitted && justDropped && <div className="after-drop-bg">
         <div className="after-submit">
-          <MetaForm cid={cid.current} />
+          <MetaForm beatFile={file} />
         </div>
       </div>}
-
-
     </div>
   );
 };

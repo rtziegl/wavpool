@@ -35,12 +35,14 @@
 
 .upload-button-1 {
   cursor: pointer;
-  padding: 0.25rem;
+  justify-content: center;
+  padding-right: 28px;
   font-size: 1rem;
   border: none;
   font-family: 'Montserrat', sans-serif;
   background-color: transparent;
-  padding-top: 30px;
+  padding-top: 15px;
+  margin-top: 20px;
 }
 
 .upload-button:hover {
@@ -87,7 +89,7 @@
 .after-drop-bg {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-content: center;
   height: 650px;
@@ -98,6 +100,14 @@
   padding-bottom: 10%;
 }
 
+.after-drop-sm{
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-left: 10%;
+  padding-top: 10px;
+  
+}
 .after-drop-left {
   height: 250px;
   width: 45%;
@@ -109,13 +119,12 @@
 }
 
 .after-drop-top {
-  height: 250px;
-  width: 45%;
+  height: 200px;
+  width: 200px;
   display: flex;
   justify-content: center;
   align-content: center;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  margin: auto;
 }
 
 .after-submit{
@@ -124,7 +133,9 @@
   align-content: center;
   margin: auto;
   padding: 0;
-  margin-top: 160px;
+  padding-top: 25px;
+  padding-left: 20px;
+  margin-top: 0px;
 }
 
 .after-drop-right {
@@ -134,7 +145,7 @@
 .meta-title {
   text-decoration: underline;
   margin-bottom: 5px;
-  margin-top: 10px;
+  margin-top: 5px;
   position: relative;
   
 }
@@ -149,7 +160,7 @@
   display: flex;
   flex-direction: row;
   padding-top: 15px;
-  padding-bottom: 5px;
+  padding-bottom: 4px;
 }
 
 .meta-form div {

@@ -3,18 +3,23 @@ import * as IPFS from "ipfs-core";
 import { ethers } from "ethers";
 import abi from "../../contract_utils/Competition.json";
 
-export default function MetaForm({ cid }) {
+export default function MetaForm({ beatFile }) {
     const [title, setTitle] = useState('');
     const [producer, setProducer] = useState('');
     const [key, setKey] = useState('');
     const [bpm, setBPM] = useState('');
     const [description, setDescription] = useState('');
-    const [beat, setBeat] = useState(cid);
+    const [beat, setBeat] = useState('');
+    const [file, setFile] = useState(beatFile)
+    console.log(file)
+    //Cid ref.
+    const cid = useRef(null);
 
     const [currentAccount, setCurrentAccount] = useState("");
     const contractAddress = "0x2ceB2b6fAD60f7c4CeF2a33846bC07Eca1Acba40";
     const contractABI = abi.abi;
 
+    // Mints NFT.
     const mint = async (nftUri) => {
         try {
             const { ethereum } = window;
@@ -23,12 +28,12 @@ export default function MetaForm({ cid }) {
                 const provider = new ethers.providers.Web3Provider(ethereum);
                 const signer = provider.getSigner();
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
-                const buyTXoptions = { value: ethers.utils.parseEther('0.01'), gasLimit: 500_000}
+                const buyTXoptions = { value: ethers.utils.parseEther('0.01'), gasLimit: 500_000 }
 
                 const isUserInComp = await compContract.getIfUserInComp();
 
                 // User in comp (free mint + gas fee).
-                if (isUserInComp == true){
+                if (isUserInComp == true) {
                     // Minting the token.
                     await compContract.mintNFTLogic(
                         nftUri,
@@ -37,35 +42,50 @@ export default function MetaForm({ cid }) {
                         },
                     ).then((tx) => {
                         provider.waitForTransaction(tx.hash)
-                        .then(()=>{
-                        console.log("success");
-                        console.log(tx.hash);
+                            .then(() => {
+                                console.log("success");
+                                console.log(tx.hash);
+                            })
+                    })
+                        .catch((error) => {
+                            console.log(error);
                         })
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                    })
                 }
 
                 // User not in comp (fee for mint + gas fee).
                 else {
                     const transaction = await compContract.mintNFTLogic(
-                        nftUri,buyTXoptions
+                        nftUri, buyTXoptions
                     )
                     // Loading here.
                     console.log("minting pls wait.")
                     const tx = await transaction.wait()
-                    if (tx.status == 1) 
+                    if (tx.status == 1)
                         console.log("success")
-                        // End loading here.
-                    else 
+                    // End loading here.
+                    else
                         console.log("fail")
                 }
-                
+
             }
         } catch (error) {
             console.log(error)
         }
+    }
+
+    // Add audio file to IPFS and get the cid.
+    const commitFileToIPFS = async () => {
+        const node = await IPFS.create({ repo: 'ok' + Math.random() })
+        const results = await node.add(file)
+
+        // Setting CID.
+        cid.current = "ipfs://"
+        cid.current += results.path
+
+        console.log(results)
+        console.log(results.path)
+        console.log({ cid })
+
     }
 
     // Adding metaData including original file IPFS to IPFS.
@@ -78,21 +98,25 @@ export default function MetaForm({ cid }) {
         mint(nftUri)
     }
 
-    function handleSubmit(event) {
+    // Handles the submit.
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        var jsonData = {
-            title,
-            producer,
-            key,
-            bpm,
-            description,
-            beat,
-        }
-
-        console.log(JSON.stringify(jsonData))
-        const finalizedData = JSON.stringify(jsonData)
-        commitJsonToIPFS(finalizedData)
+        await commitFileToIPFS().then(() => {
+            var jsonData = {
+                title,
+                producer,
+                key,
+                bpm,
+                description,
+                cid,
+            }
+            console.log(jsonData)
+            console.log(JSON.stringify(jsonData))
+            const finalizedData = JSON.stringify(jsonData)
+            commitJsonToIPFS(finalizedData)
+        })
     }
+
 
     return (
         <form onSubmit={handleSubmit} className="meta-form">
@@ -143,9 +167,7 @@ export default function MetaForm({ cid }) {
                     cols="50"
                 />
             </div>
-            <div className="extra-button-space-1">
-                <button className="button-59" role="button" type="submit">Submit</button>
-            </div>
+            <button className="button-59" role="button" type="submit">Mint</button>
         </form>
     );
 }
