@@ -47,6 +47,7 @@ const main = async () => {
       let i = 0;
       let x = false;
       const tx = await transaction.wait()
+  
       
       console.log(tx.status)
       const event = tx.events[0];

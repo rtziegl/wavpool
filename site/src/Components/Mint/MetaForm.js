@@ -11,6 +11,13 @@ export default function MetaForm({ beatFile }) {
     const [description, setDescription] = useState('');
     const [beat, setBeat] = useState('');
     const [file, setFile] = useState(beatFile)
+    const [loading, setLoading] = useState(false)
+    const handleLoadingStart = () => {
+        setLoading(true);
+    };
+    const handleLoadingEnd = () => {
+        setLoading(false);
+    };
     console.log(file)
     //Cid ref.
     const cid = useRef(null);
@@ -59,7 +66,9 @@ export default function MetaForm({ beatFile }) {
                     )
                     // Loading here.
                     console.log("minting pls wait.")
+                    handleLoadingStart()
                     const tx = await transaction.wait()
+                    handleLoadingEnd()
                     if (tx.status == 1)
                         console.log("success")
                     // End loading here.
@@ -119,55 +128,60 @@ export default function MetaForm({ beatFile }) {
 
 
     return (
-        <form onSubmit={handleSubmit} className="meta-form">
-            <h2 className="meta-title">Metadata</h2>
-            <div>
-                <label htmlFor="title">Title</label>
-                <input
-                    id="title"
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="producer">Producer</label>
-                <input
-                    id="producer"
-                    type="text"
-                    value={producer}
-                    onChange={(e) => setProducer(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="key">Key</label>
-                <input
-                    id="key"
-                    type="text"
-                    value={key}
-                    onChange={(e) => setKey(e.target.value)}
-                />
-            </div>
-            <div>
-                <label htmlFor="BPM">BPM</label>
-                <input
-                    id="BPM"
-                    type="text"
-                    value={bpm}
-                    onChange={(e) => setBPM(e.target.value)}
-                />
-            </div>
-            <div>
-                <label className='extra-text-space' htmlFor="description">Description</label>
-                <textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows="4"
-                    cols="50"
-                />
-            </div>
-            <button className="button-59" role="button" type="submit">Mint</button>
-        </form>
+        <div>
+            {!loading && (<form onSubmit={handleSubmit} className="meta-form">
+                <h2 className="meta-title">Metadata</h2>
+                <div>
+                    <label htmlFor="title">Title</label>
+                    <input
+                        id="title"
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="producer">Producer</label>
+                    <input
+                        id="producer"
+                        type="text"
+                        value={producer}
+                        onChange={(e) => setProducer(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="key">Key</label>
+                    <input
+                        id="key"
+                        type="text"
+                        value={key}
+                        onChange={(e) => setKey(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <label htmlFor="BPM">BPM</label>
+                    <input
+                        id="BPM"
+                        type="text"
+                        value={bpm}
+                        onChange={(e) => setBPM(e.target.value)}
+                    />
+                </div>
+                <div>
+                    <label className='extra-text-space' htmlFor="description">Description</label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows="4"
+                        cols="50"
+                    />
+                </div>
+                <button className="button-59" role="button" type="submit">Mint</button>
+            </form>)}
+            {loading && <div>
+                Loading ....
+            </div>}
+        </div>
     );
 }
