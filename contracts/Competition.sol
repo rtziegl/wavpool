@@ -388,6 +388,12 @@ contract Competition is ERC721URIStorage {
         );
     }
 
+    // Public version to check if user is in competition.
+    function getIfUserInComp() public view returns(bool){
+        bool isUser = checkIfUserInCompetition();
+        return isUser;
+    }
+
     // Adds an admin.
     function addAdmin(address admin) public onlyOwner {
         _admins[admin] = Admin(admin);

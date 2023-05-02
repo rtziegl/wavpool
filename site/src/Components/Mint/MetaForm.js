@@ -12,7 +12,7 @@ export default function MetaForm({ cid }) {
     const [beat, setBeat] = useState(cid);
 
     const [currentAccount, setCurrentAccount] = useState("");
-    const contractAddress = "0x4e2F61DDAF59e21F022e42e6C2EF088FabD33853";
+    const contractAddress = "0x2ceB2b6fAD60f7c4CeF2a33846bC07Eca1Acba40";
     const contractABI = abi.abi;
 
     const mint = async (nftUri) => {
@@ -23,14 +23,22 @@ export default function MetaForm({ cid }) {
                 const provider = new ethers.providers.Web3Provider(ethereum);
                 const signer = provider.getSigner();
                 const compContract = new ethers.Contract(contractAddress, contractABI, signer);
-
                 // Minting the token.
-                const transaction = await compContract.mintNFTLogic(
+                await compContract.mintNFTLogic(
                     nftUri,
                     {
                         gasLimit: 500_000,
                     },
-                )
+                ).then((tx) => {
+                    provider.waitForTransaction(tx.hash)
+                    .then(()=>{
+                      console.log("success");
+                      console.log(tx.hash);
+                    })
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  })
             }
         } catch (error) {
             console.log(error)
