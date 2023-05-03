@@ -209,3 +209,8 @@ h4 {
   margin: auto;
   padding-top: 10px;
 }
+
+.custom-triangle{
+  background-color: #ffffff00;
+  opacity: 100%;
+}

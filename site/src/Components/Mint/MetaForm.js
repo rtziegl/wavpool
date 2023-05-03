@@ -2,6 +2,11 @@ import React, { useEffect, useState, useRef } from "react";
 import * as IPFS from "ipfs-core";
 import { ethers } from "ethers";
 import abi from "../../contract_utils/Competition.json";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import { LinearProgress, colors } from "@mui/material";
+import Box from '@mui/material/Box';
+import { Triangle } from "react-loader-spinner";
 
 export default function MetaForm({ beatFile }) {
     const [title, setTitle] = useState('');
@@ -12,6 +17,7 @@ export default function MetaForm({ beatFile }) {
     const [beat, setBeat] = useState('');
     const [file, setFile] = useState(beatFile)
     const [loading, setLoading] = useState(false)
+    const spinColor = "#A7117A"
     const handleLoadingStart = () => {
         setLoading(true);
     };
@@ -126,10 +132,9 @@ export default function MetaForm({ beatFile }) {
         })
     }
 
-
     return (
         <div>
-            {!loading && (<form onSubmit={handleSubmit} className="meta-form">
+            <form onSubmit={handleSubmit} className="meta-form">
                 <h2 className="meta-title">Metadata</h2>
                 <div>
                     <label htmlFor="title">Title</label>
@@ -178,9 +183,16 @@ export default function MetaForm({ beatFile }) {
                     />
                 </div>
                 <button className="button-59" role="button" type="submit">Mint</button>
-            </form>)}
+            </form>
             {loading && <div>
-                Loading ....
+                <Backdrop
+                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                    open={loading}
+                >
+                    <Box sx={{ width: '30%', color: '#A7117A'}}>
+                        <LinearProgress color="inherit"/>
+                    </Box>
+                </Backdrop>
             </div>}
         </div>
     );
